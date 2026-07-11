@@ -2,6 +2,8 @@ using Unity.InferenceEngine;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 
 public class sentisHandTracker : MonoBehaviour
 {
@@ -11,10 +13,12 @@ public class sentisHandTracker : MonoBehaviour
     Worker palmWorker;
     Tensor<float> palmInputTensor;
 
-    [Range(0f, 1f)] public float scoreThreshold;
-    [Range(0f, 1f)] public float iouThreshold;
+    [Range(0f, 1f)] public float scoreThreshold = 0.5f;
+    [Range(0f, 1f)] public float iouThreshold = 0.3f;
 
-    Rect handRect = Rect.zero;
+    [Header("Multi-hand")]
+    [Range(1, 4)] public int maxHands = 2;
+
     List<Vector2> anchors = new List<Vector2>();
     TextureTransform nhwcTransform;
 
@@ -27,32 +31,71 @@ public class sentisHandTracker : MonoBehaviour
     [Header("Camera Feed")]
     WebCamTexture webCam;
     RenderTexture croppedHandBuffer;
+    Material blitMaterial;
 
-    [Header("visualize hand")]
+    [Header("Visualize Hand")]
     public Transform joint;
     public Canvas canvas;
-    List<Transform> jointInstances = new List<Transform>();
-
     public LineRenderer fingerPrefap;
-    List<LineRenderer> fingers = new List<LineRenderer>();
 
-    [Header("debuging")]
+    List<List<Transform>> jointInstancesPerHand = new List<List<Transform>>();
+    List<List<LineRenderer>> fingersPerHand = new List<List<LineRenderer>>();
+
+    [Header("Debugging")]
     public RectTransform debugBox;
+    List<RectTransform> debugBoxesPerHand = new List<RectTransform>();
+    List<TextMeshProUGUI> directionText = new List<TextMeshProUGUI>();
     public RawImage croppedPalm;
+
+    int[][] fingerJoints = new int[][]
+    {
+        new int[] {0,1,2,3,4},    // thumb
+        new int[] {0,5,6,7,8},    // index
+        new int[] {0,9,10,11,12}, // middle
+        new int[] {0,13,14,15,16},// ring
+        new int[] {0,17,18,19,20} // pinky
+    };
+
+    struct Candidate
+    {
+        public Rect box;
+        public float score;
+        public Vector2[] landMarks;
+        public float angle;
+    }
 
     private void Start()
     {
-        for (int i = 0; i < 21; i++)
-        {
-            Transform jointInstance = Instantiate(joint, transform);
-            jointInstances.Add(jointInstance);
+        blitMaterial = new Material(Shader.Find("Hidden/BlitCopy"));
 
-            if (i < 5)
+        webCam = new WebCamTexture(512, 512);
+        webCam.Play();
+
+        for (int h = 0; h < maxHands; h++)
+        {
+            var joints = new List<Transform>();
+            for (int i = 0; i < 21; i++)
+            {
+                Transform jointInstance = Instantiate(joint, transform);
+                jointInstance.gameObject.SetActive(false);
+                joints.Add(jointInstance);
+            }
+            jointInstancesPerHand.Add(joints);
+
+            var fingerSet = new List<LineRenderer>();
+            for (int f = 0; f < 5; f++)
             {
                 LineRenderer lineInstance = Instantiate(fingerPrefap, transform);
-                lineInstance.positionCount = fingerJoints[i].Length;
-                fingers.Add(lineInstance);
+                lineInstance.positionCount = fingerJoints[f].Length;
+                lineInstance.gameObject.SetActive(false);
+                fingerSet.Add(lineInstance);
             }
+            fingersPerHand.Add(fingerSet);
+
+            RectTransform dbInstance = Instantiate(debugBox, canvas.transform);
+            dbInstance.gameObject.SetActive(false);
+            debugBoxesPerHand.Add(dbInstance);
+            directionText.Add(dbInstance.GetChild(0).GetComponent<TextMeshProUGUI>());
         }
 
         runtimePalmModel = ModelLoader.Load(palmModelAsset);
@@ -67,14 +110,12 @@ public class sentisHandTracker : MonoBehaviour
         inputTensor = new Tensor<float>(new TensorShape(1, 224, 224, 3));
 
         croppedHandBuffer = new RenderTexture(224, 224, 0, RenderTextureFormat.ARGB32);
-        croppedPalm.texture = croppedHandBuffer;
-
-        webCam = new WebCamTexture();
-        webCam.Play();
+        if (croppedPalm != null) croppedPalm.texture = croppedHandBuffer;
     }
+
     List<Vector2> GeneratePalmAnchors()
     {
-        var anchors = new List<Vector2>();
+        var anchorsList = new List<Vector2>();
         int[] strides = { 8, 16, 16, 16 };
         const int inputSize = 192;
         const int anchorsPerCell = 2;
@@ -83,103 +124,118 @@ public class sentisHandTracker : MonoBehaviour
         {
             int featureMapSize = inputSize / stride;
             for (int y = 0; y < featureMapSize; y++)
+            {
                 for (int x = 0; x < featureMapSize; x++)
                 {
                     float xCenter = (x + 0.5f) / featureMapSize;
                     float yCenter = (y + 0.5f) / featureMapSize;
                     for (int a = 0; a < anchorsPerCell; a++)
-                        anchors.Add(new Vector2(xCenter, yCenter));
+                    {
+                        anchorsList.Add(new Vector2(xCenter, yCenter));
+                    }
                 }
+            }
         }
-        return anchors;
+        return anchorsList;
     }
+
     private void Update()
     {
         if (webCam == null || !webCam.didUpdateThisFrame) return;
 
-        handRect = ExpandToSquare(PerformPalmDetection(), 3f);
+        List<Candidate> handCandidates = PerformPalmDetection();
 
-        if (handRect.width > 0 && handRect.height > 0)
+        for (int h = 0; h < maxHands; h++)
         {
-            CropHandRegion(webCam, handRect);
+            if (h >= handCandidates.Count)
+            {
+                setHandActive(h, false);
+                continue;
+            }
 
+            Candidate candidate = handCandidates[h];
+            Rect handRect = ExpandToSquare(candidate.box, 3f);
+
+            if (handRect.width <= 0 || handRect.height <= 0)
+            {
+                setHandActive(h, false);
+                continue;
+            }
+
+            CropHandRegion(webCam, handRect, candidate.angle);
             TextureConverter.ToTensor(croppedHandBuffer, inputTensor, nhwcTransform);
-
             worker.Schedule(inputTensor);
 
-            if (worker.PeekOutput() is Tensor<float> outputTensor)
+            Vector2[] landMarks = null;
+            if (worker.PeekOutput(0) is Tensor<float> outputTensor)
             {
                 using Tensor<float> cpuTensor = outputTensor.ReadbackAndClone();
-                ProcessLandmarks(cpuTensor, handRect, out Vector2[] landMarks);
+                ProcessLandmarks(cpuTensor, handRect, candidate.angle, out landMarks);
+            }
 
-                if (landMarks != null)
+            if (worker.PeekOutput(2) is Tensor<float> direction)
+            {
+                float isRightHand = direction.ReadbackAndClone().DownloadToArray()[0];
+                directionText[h].text = isRightHand < 0.5f ? "Left Hand" : "Right Hand";
+            }
+
+            if (landMarks != null)
+            {
+                setHandActive(h, true);
+
+                List<Transform> joints = jointInstancesPerHand[h];
+                List<LineRenderer> fingers = fingersPerHand[h];
+
+                for (int i = 0; i < landMarks.Length && i < joints.Count; i++) joints[i].position = landMarks[i];
+
+                for (int f = 0; f < fingers.Count; f++)
                 {
-                    for (int i = 0; i < landMarks.Length; i++) 
+                    for (int p = 0; p < fingerJoints[f].Length; p++)
                     {
-                        jointInstances[i].gameObject.SetActive(true);
-                        jointInstances[i].position = landMarks[i];
-                    }
-
-                    for (int f = 0; f < fingers.Count; f++)
-                    {
-                        fingers[f].gameObject.SetActive(true);
-                        for (int p = 0; p < fingerJoints[f].Length; p++)
-                        {
-                            int landmarkIndex = fingerJoints[f][p];
-                            fingers[f].SetPosition(p, landMarks[landmarkIndex]);
-                        }
+                        int landmarkIndex = fingerJoints[f][p];
+                        fingers[f].SetPosition(p, landMarks[landmarkIndex]);
                     }
                 }
-                else
-                {
-                    for (int i = 0; i < jointInstances.Count; i++)
-                    {
-                        jointInstances[i].gameObject.SetActive(false);
-                        if (i < fingers.Count)
-                        {
-                            fingers[i].gameObject.SetActive(false);
-                        }
-                    }
-                }
+
+                float screenX = (handRect.x + handRect.width * 0.5f) * Screen.width;
+                float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * Screen.height;
+
+                debugBoxesPerHand[h].gameObject.SetActive(true);
+                debugBoxesPerHand[h].position = new Vector3(screenX, screenY, 0);
+                debugBoxesPerHand[h].sizeDelta = new Vector2(handRect.width * Screen.width, handRect.height * Screen.height);
+
+                float angleDegrees = candidate.angle * Mathf.Rad2Deg;
+                debugBoxesPerHand[h].localRotation = Quaternion.Euler(0, 0, angleDegrees);
             }
             else
             {
-                for (int i = 0; i < jointInstances.Count; i++)
-                {
-                    jointInstances[i].gameObject.SetActive(false);
-                    if (i < fingers.Count)
-                    {
-                        fingers[i].gameObject.SetActive(false);
-                    }
-                }
+                setHandActive(h, false);
             }
-
-            float screenX = (handRect.x + handRect.width * 0.5f) * Screen.width;
-            float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * Screen.height;
-            debugBox.position = new Vector3(screenX, screenY, 0);
-            debugBox.sizeDelta = new Vector2(handRect.width * Screen.width, handRect.height * Screen.height);
         }
     }
 
-    int[][] fingerJoints = new int[][]
+    void setHandActive(int handIndex, bool active)
     {
-        new int[] {0,1,2,3,4},    // thumb
-        new int[] {0,5,6,7,8},    // index
-        new int[] {0,9,10,11,12}, // middle
-        new int[] {0,13,14,15,16},// ring
-        new int[] {0,17,18,19,20} // pinky
-    };
+        foreach (var j in jointInstancesPerHand[handIndex]) j.gameObject.SetActive(active);
+        foreach (var f in fingersPerHand[handIndex]) f.gameObject.SetActive(active);
+        if (!active) debugBoxesPerHand[handIndex].gameObject.SetActive(false);
+    }
+
     private Rect ExpandToSquare(Rect box, float scale)
     {
-        float cx = box.x + box.width * 0.5f;
-        float cy = box.y + box.height * 0.5f;
-        float size = Mathf.Max(box.width, box.height) * scale;
+        float w = Mathf.Clamp(box.width, 0, 1 / scale);
+        float h = Mathf.Clamp(box.height, 0, 1 / scale);
+
+        float cx = box.x + w * 0.5f;
+        float cy = box.y + h * 0.5f;
+        float size = Mathf.Max(w, h) * scale;
 
         float x = Mathf.Clamp(cx - size * 0.5f, 0, 1 - size);
         float y = Mathf.Clamp(cy - size * 0.5f, 0, 1 - size);
         return new Rect(x, y, size, size);
     }
-    private Rect PerformPalmDetection()
+
+    private List<Candidate> PerformPalmDetection()
     {
         TextureConverter.ToTensor(webCam, palmInputTensor, nhwcTransform);
         palmWorker.Schedule(palmInputTensor);
@@ -187,7 +243,7 @@ public class sentisHandTracker : MonoBehaviour
         Tensor<float> rawBoxes = palmWorker.PeekOutput(0) as Tensor<float>;
         Tensor<float> rawScores = palmWorker.PeekOutput(1) as Tensor<float>;
 
-        if (rawBoxes == null || rawScores == null) return Rect.zero;
+        if (rawBoxes == null || rawScores == null) return new List<Candidate>();
 
         Tensor<float> boxes = rawBoxes;
         Tensor<float> scores = rawScores;
@@ -203,58 +259,155 @@ public class sentisHandTracker : MonoBehaviour
 
         return ParsePalmBBoxes(boxData, scoreData);
     }
-    private Rect ParsePalmBBoxes(float[] boxData, float[] scoreData)
+
+    private List<Candidate> NonMaxSuppression(List<Candidate> candidates, float iouThresh, int maxResults)
     {
-        int bestIndex = 0;
-        float maxScore = float.MinValue;
-        for (int i = 0; i < scoreData.Length; i++)
+        var sorted = candidates.OrderByDescending(c => c.score).ToList();
+        var kept = new List<Candidate>();
+
+        while (sorted.Count > 0 && kept.Count < maxResults)
         {
-            if (scoreData[i] > maxScore)
-            {
-                maxScore = scoreData[i]; bestIndex = i;
-            }
+            Candidate best = sorted[0];
+            kept.Add(best);
+            sorted.RemoveAt(0);
+            sorted.RemoveAll(c => IoU(c.box, best.box) > iouThresh);
         }
 
-        float confidence = 1f / (1f + Mathf.Exp(-maxScore));
-        if (confidence < scoreThreshold) return Rect.zero;
-
-        int offset = bestIndex * 18;
-        Vector2 anchor = anchors[bestIndex];
-        const float inputSize = 192f;
-
-        float cx = boxData[offset + 0] / inputSize + anchor.x;
-        float cy = boxData[offset + 1] / inputSize + anchor.y;
-        float w = boxData[offset + 2] / inputSize;
-        float h = boxData[offset + 3] / inputSize;
-
-        float xMin = Mathf.Clamp01(cx - w * 0.5f);
-        float yMin = Mathf.Clamp01(cy - h * 0.5f);
-        return new Rect(xMin, yMin, w, h);
+        return kept;
     }
-    private void CropHandRegion(Texture sourceTex, Rect area)
+
+    private List<Candidate> ParsePalmBBoxes(float[] boxData, float[] scoreData)
     {
-        Vector2 scale = new Vector2(area.width, area.height);
-        Vector2 offset = new Vector2(area.x, 1f - area.y - area.height);
-        Graphics.Blit(sourceTex, croppedHandBuffer, scale, offset);
+        List<Candidate> candidates = new List<Candidate>();
+
+        for (int i = 0; i < scoreData.Length; i++)
+        {
+            float confidence = 1f / (1f + Mathf.Exp(-scoreData[i]));
+            if (confidence < scoreThreshold) continue;
+
+            int offset = i * 18;
+
+            float cx = boxData[offset + 0] / 192 + anchors[i].x;
+            float cy = boxData[offset + 1] / 192 + anchors[i].y;
+            float w = boxData[offset + 2] / 192;
+            float h = boxData[offset + 3] / 192;
+
+            float xMin = Mathf.Clamp01(cx - w * 0.5f);
+            float yMin = Mathf.Clamp01(cy - h * 0.5f);
+
+            Vector2[] landMarks = new Vector2[7];
+            for (int k = 0; k < 7; k++)
+            {
+                float kx = boxData[offset + 4 + k * 2 + 0] / 192 + anchors[i].x;
+                float ky = boxData[offset + 4 + k * 2 + 1] / 192 + anchors[i].y;
+                landMarks[k] = new Vector2(kx, ky);
+            }
+
+            Vector2 dir = landMarks[2] - landMarks[0];
+            float handAngle = NormalizeRadians((0.5f * Mathf.PI) - Mathf.Atan2(-(dir.y), dir.x));
+
+            candidates.Add(new Candidate { box = new Rect(xMin, yMin, w, h), score = confidence, landMarks = landMarks, angle = handAngle });
+        }
+
+        return NonMaxSuppression(candidates, iouThreshold, maxHands);
     }
-    void ProcessLandmarks(Tensor<float> tensorData, Rect appliedCrop, out Vector2[]worldLandMarks)
+
+    float NormalizeRadians(float angle)
+    {
+        return angle - (2f * Mathf.PI) * Mathf.Floor((angle + Mathf.PI) / (2f * Mathf.PI));
+    }
+
+    private float IoU(Rect a, Rect b)
+    {
+        float x1 = Mathf.Max(a.xMin, b.xMin);
+        float y1 = Mathf.Max(a.yMin, b.yMin);
+        float x2 = Mathf.Min(a.xMax, b.xMax);
+        float y2 = Mathf.Min(a.yMax, b.yMax);
+
+        float interW = Mathf.Max(0, x2 - x1);
+        float interH = Mathf.Max(0, y2 - y1);
+        float interArea = interW * interH;
+
+        float unionArea = a.width * a.height + b.width * b.height - interArea;
+        if (unionArea <= 0) return 0;
+        return interArea / unionArea;
+    }
+
+    private void CropHandRegion(Texture sourceTex, Rect area, float angleRadians)
+    {
+        RenderTexture.active = croppedHandBuffer;
+        GL.Clear(true, true, Color.clear);
+
+        GL.PushMatrix();
+        GL.LoadOrtho();
+
+        blitMaterial.mainTexture = sourceTex;
+        blitMaterial.SetPass(0);
+
+        Vector2 center = new Vector2(area.x + area.width * 0.5f, 1f - (area.y + area.height * 0.5f));
+        Vector2 halfExtents = new Vector2(area.width * 0.5f, area.height * 0.5f);
+
+        Vector2[] localCorners = new Vector2[4]
+        {
+            new Vector2(-halfExtents.x, -halfExtents.y),
+            new Vector2(halfExtents.x, -halfExtents.y),
+            new Vector2(halfExtents.x, halfExtents.y),
+            new Vector2(-halfExtents.x, halfExtents.y)
+        };
+
+        float cos = Mathf.Cos(-angleRadians);
+        float sin = Mathf.Sin(-angleRadians);
+
+        GL.Begin(GL.QUADS);
+        for (int i = 0; i < 4; i++)
+        {
+            float rotX = localCorners[i].x * cos - localCorners[i].y * sin;
+            float rotY = localCorners[i].x * sin + localCorners[i].y * cos;
+            Vector2 uv = center + new Vector2(rotX, rotY);
+
+            GL.TexCoord2(uv.x, uv.y);
+
+            if (i == 0) GL.Vertex3(0, 0, 0);
+            if (i == 1) GL.Vertex3(1, 0, 0);
+            if (i == 2) GL.Vertex3(1, 1, 0);
+            if (i == 3) GL.Vertex3(0, 1, 0);
+        }
+        GL.End();
+
+        GL.PopMatrix();
+        RenderTexture.active = null;
+    }
+
+    void ProcessLandmarks(Tensor<float> tensorData, Rect appliedCrop, float angleRadians, out Vector2[] worldLandMarks)
     {
         if (tensorData.count >= 63)
         {
             float[] data = tensorData.DownloadToArray();
-
             Vector2[] worldPositions = new Vector2[21];
+
+            float cos = Mathf.Cos(angleRadians);
+            float sin = Mathf.Sin(angleRadians);
+
+            Vector2 center = new Vector2(appliedCrop.x + appliedCrop.width * 0.5f, 1f - (appliedCrop.y + appliedCrop.height * 0.5f));
+
             for (int i = 0; i < 63; i += 3)
             {
                 float cropX = data[i] / 224f;
                 float cropY = data[i + 1] / 224f;
-                float cropZ = data[i + 2] / 224f;
 
-                float screenX = (appliedCrop.x + (cropX * appliedCrop.width)) * Screen.width;
-                float screenY = (1.0f - (appliedCrop.y + (cropY * appliedCrop.height))) * Screen.height;
-                Vector2 screenPos = new Vector3(screenX, screenY, 0);
+                float cx = cropX - 0.5f;
+                float cy = 0.5f - cropY;
 
-                worldPositions[i / 3] = Camera.main.ScreenToWorldPoint(screenPos);
+                float rotX = cx * cos - cy * sin;
+                float rotY = cx * sin + cy * cos;
+
+                float globalX = center.x + rotX * appliedCrop.width;
+                float globalY = center.y + rotY * appliedCrop.height;
+
+                float screenX = globalX * Screen.width;
+                float screenY = globalY * Screen.height;
+
+                worldPositions[i / 3] = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, 10f));
             }
             worldLandMarks = worldPositions;
         }
@@ -270,6 +423,8 @@ public class sentisHandTracker : MonoBehaviour
         worker?.Dispose();
         palmInputTensor?.Dispose();
         inputTensor?.Dispose();
+
+        if (blitMaterial != null) Destroy(blitMaterial);
 
         if (croppedHandBuffer != null)
         {
