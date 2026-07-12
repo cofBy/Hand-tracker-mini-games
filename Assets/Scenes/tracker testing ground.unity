@@ -173,6 +173,8 @@ MonoBehaviour:
   fingerPrefap: {fileID: -475619121342039191, guid: 61cc893c1d4066147a48775c76c27c7e, type: 3}
   debugBox: {fileID: 3264046150176805273, guid: eebb8ca7a395b7b4f8ce7907e855f7c4, type: 3}
   croppedPalm: {fileID: 644075371}
+  cameraFeed: {fileID: 0}
+  flipCamera: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

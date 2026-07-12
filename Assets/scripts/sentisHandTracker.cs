@@ -46,6 +46,8 @@ public class sentisHandTracker : MonoBehaviour
     List<RectTransform> debugBoxesPerHand = new List<RectTransform>();
     List<TextMeshProUGUI> directionText = new List<TextMeshProUGUI>();
     public RawImage croppedPalm;
+    public RawImage cameraFeed;
+    public bool flipCamera;
 
     int[][] fingerJoints = new int[][]
     {
@@ -55,7 +57,6 @@ public class sentisHandTracker : MonoBehaviour
         new int[] {0,13,14,15,16},// ring
         new int[] {0,17,18,19,20} // pinky
     };
-
     struct Candidate
     {
         public Rect box;
@@ -70,6 +71,11 @@ public class sentisHandTracker : MonoBehaviour
 
         webCam = new WebCamTexture(512, 512);
         webCam.Play();
+        if (cameraFeed != null)
+        {
+            cameraFeed.texture = webCam;
+            if (flipCamera) cameraFeed.uvRect = new Rect(1, 0, -1, 1);
+        }
 
         for (int h = 0; h < maxHands; h++)
         {
@@ -112,7 +118,6 @@ public class sentisHandTracker : MonoBehaviour
         croppedHandBuffer = new RenderTexture(224, 224, 0, RenderTextureFormat.ARGB32);
         if (croppedPalm != null) croppedPalm.texture = croppedHandBuffer;
     }
-
     List<Vector2> GeneratePalmAnchors()
     {
         var anchorsList = new List<Vector2>();
@@ -138,10 +143,10 @@ public class sentisHandTracker : MonoBehaviour
         }
         return anchorsList;
     }
-
     private void Update()
     {
         if (webCam == null || !webCam.didUpdateThisFrame) return;
+        flipCamera = WebCamTexture.devices[0].isFrontFacing;
 
         List<Candidate> handCandidates = PerformPalmDetection();
 
@@ -200,6 +205,8 @@ public class sentisHandTracker : MonoBehaviour
                 float screenX = (handRect.x + handRect.width * 0.5f) * Screen.width;
                 float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * Screen.height;
 
+                if (flipCamera) screenX = Screen.width - screenX;
+
                 debugBoxesPerHand[h].gameObject.SetActive(true);
                 debugBoxesPerHand[h].position = new Vector3(screenX, screenY, 0);
                 debugBoxesPerHand[h].sizeDelta = new Vector2(handRect.width * Screen.width, handRect.height * Screen.height);
@@ -221,7 +228,7 @@ public class sentisHandTracker : MonoBehaviour
         if (!active) debugBoxesPerHand[handIndex].gameObject.SetActive(false);
     }
 
-    private Rect ExpandToSquare(Rect box, float scale)
+    Rect ExpandToSquare(Rect box, float scale)
     {
         float w = Mathf.Clamp(box.width, 0, 1 / scale);
         float h = Mathf.Clamp(box.height, 0, 1 / scale);
@@ -234,8 +241,7 @@ public class sentisHandTracker : MonoBehaviour
         float y = Mathf.Clamp(cy - size * 0.5f, 0, 1 - size);
         return new Rect(x, y, size, size);
     }
-
-    private List<Candidate> PerformPalmDetection()
+    List<Candidate> PerformPalmDetection()
     {
         TextureConverter.ToTensor(webCam, palmInputTensor, nhwcTransform);
         palmWorker.Schedule(palmInputTensor);
@@ -259,8 +265,7 @@ public class sentisHandTracker : MonoBehaviour
 
         return ParsePalmBBoxes(boxData, scoreData);
     }
-
-    private List<Candidate> NonMaxSuppression(List<Candidate> candidates, float iouThresh, int maxResults)
+    List<Candidate> NonMaxSuppression(List<Candidate> candidates, float iouThresh, int maxResults)
     {
         var sorted = candidates.OrderByDescending(c => c.score).ToList();
         var kept = new List<Candidate>();
@@ -275,8 +280,7 @@ public class sentisHandTracker : MonoBehaviour
 
         return kept;
     }
-
-    private List<Candidate> ParsePalmBBoxes(float[] boxData, float[] scoreData)
+    List<Candidate> ParsePalmBBoxes(float[] boxData, float[] scoreData)
     {
         List<Candidate> candidates = new List<Candidate>();
 
@@ -285,26 +289,24 @@ public class sentisHandTracker : MonoBehaviour
             float confidence = 1f / (1f + Mathf.Exp(-scoreData[i]));
             if (confidence < scoreThreshold) continue;
 
-            int offset = i * 18;
+            Vector2[] landMarks = new Vector2[9];
+            for (int k = 0; k < 9; k++)
+            {
+                float kx = boxData[i * 18 + k * 2 + 0] / 192 + anchors[i].x;
+                float ky = boxData[i * 18 + k * 2 + 1] / 192 + anchors[i].y;
+                landMarks[k] = new Vector2(kx, ky);
+            }
 
-            float cx = boxData[offset + 0] / 192 + anchors[i].x;
-            float cy = boxData[offset + 1] / 192 + anchors[i].y;
-            float w = boxData[offset + 2] / 192;
-            float h = boxData[offset + 3] / 192;
+            float cx = landMarks[0].x;
+            float cy = landMarks[0].y;
+            float w  = landMarks[1].x - anchors[i].x;
+            float h  = landMarks[2].y - anchors[i].y;
 
             float xMin = Mathf.Clamp01(cx - w * 0.5f);
             float yMin = Mathf.Clamp01(cy - h * 0.5f);
 
-            Vector2[] landMarks = new Vector2[7];
-            for (int k = 0; k < 7; k++)
-            {
-                float kx = boxData[offset + 4 + k * 2 + 0] / 192 + anchors[i].x;
-                float ky = boxData[offset + 4 + k * 2 + 1] / 192 + anchors[i].y;
-                landMarks[k] = new Vector2(kx, ky);
-            }
-
-            Vector2 dir = landMarks[2] - landMarks[0];
-            float handAngle = NormalizeRadians((0.5f * Mathf.PI) - Mathf.Atan2(-(dir.y), dir.x));
+            Vector2 dir = landMarks[4] - landMarks[2];
+            float handAngle = NormalizeRadians((0.5f * Mathf.PI) - Mathf.Atan2(-dir.y, dir.x));
 
             candidates.Add(new Candidate { box = new Rect(xMin, yMin, w, h), score = confidence, landMarks = landMarks, angle = handAngle });
         }
@@ -316,8 +318,7 @@ public class sentisHandTracker : MonoBehaviour
     {
         return angle - (2f * Mathf.PI) * Mathf.Floor((angle + Mathf.PI) / (2f * Mathf.PI));
     }
-
-    private float IoU(Rect a, Rect b)
+    float IoU(Rect a, Rect b)
     {
         float x1 = Mathf.Max(a.xMin, b.xMin);
         float y1 = Mathf.Max(a.yMin, b.yMin);
@@ -333,7 +334,7 @@ public class sentisHandTracker : MonoBehaviour
         return interArea / unionArea;
     }
 
-    private void CropHandRegion(Texture sourceTex, Rect area, float angleRadians)
+    void CropHandRegion(Texture sourceTex, Rect area, float angleRadians)
     {
         RenderTexture.active = croppedHandBuffer;
         GL.Clear(true, true, Color.clear);
@@ -355,8 +356,8 @@ public class sentisHandTracker : MonoBehaviour
             new Vector2(-halfExtents.x, halfExtents.y)
         };
 
-        float cos = Mathf.Cos(-angleRadians);
         float sin = Mathf.Sin(-angleRadians);
+        float cos = Mathf.Cos(-angleRadians);
 
         GL.Begin(GL.QUADS);
         for (int i = 0; i < 4; i++)
@@ -377,7 +378,6 @@ public class sentisHandTracker : MonoBehaviour
         GL.PopMatrix();
         RenderTexture.active = null;
     }
-
     void ProcessLandmarks(Tensor<float> tensorData, Rect appliedCrop, float angleRadians, out Vector2[] worldLandMarks)
     {
         if (tensorData.count >= 63)
@@ -385,8 +385,8 @@ public class sentisHandTracker : MonoBehaviour
             float[] data = tensorData.DownloadToArray();
             Vector2[] worldPositions = new Vector2[21];
 
-            float cos = Mathf.Cos(angleRadians);
-            float sin = Mathf.Sin(angleRadians);
+            float sin = Mathf.Sin(-angleRadians);
+            float cos = Mathf.Cos(-angleRadians);
 
             Vector2 center = new Vector2(appliedCrop.x + appliedCrop.width * 0.5f, 1f - (appliedCrop.y + appliedCrop.height * 0.5f));
 
@@ -406,6 +406,8 @@ public class sentisHandTracker : MonoBehaviour
 
                 float screenX = globalX * Screen.width;
                 float screenY = globalY * Screen.height;
+
+                if (flipCamera) screenX = Screen.width - screenX;
 
                 worldPositions[i / 3] = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, 10f));
             }
