@@ -41,10 +41,14 @@ public class sentisHandTracker : MonoBehaviour
     List<List<Transform>> jointInstancesPerHand = new List<List<Transform>>();
     List<List<LineRenderer>> fingersPerHand = new List<List<LineRenderer>>();
 
+    [Header("info")]
+    public Vector2[] handLandmarks = new Vector2[21];
+
     [Header("Debugging")]
     public RectTransform debugBox;
     List<RectTransform> debugBoxesPerHand = new List<RectTransform>();
     List<TextMeshProUGUI> directionText = new List<TextMeshProUGUI>();
+    List<TextMeshProUGUI> fistText = new List<TextMeshProUGUI>();
     public RawImage croppedPalm;
     public RawImage cameraFeed;
     public bool flipCamera;
@@ -98,10 +102,14 @@ public class sentisHandTracker : MonoBehaviour
             }
             fingersPerHand.Add(fingerSet);
 
-            RectTransform dbInstance = Instantiate(debugBox, canvas.transform);
-            dbInstance.gameObject.SetActive(false);
-            debugBoxesPerHand.Add(dbInstance);
-            directionText.Add(dbInstance.GetChild(0).GetComponent<TextMeshProUGUI>());
+            if (debugBox != null)
+            {
+                RectTransform dbInstance = Instantiate(debugBox, canvas.transform);
+                dbInstance.gameObject.SetActive(false);
+                debugBoxesPerHand.Add(dbInstance);
+                directionText.Add(dbInstance.GetChild(0).GetComponent<TextMeshProUGUI>());
+                fistText.Add(dbInstance.GetChild(1).GetComponent<TextMeshProUGUI>());
+            }
         }
 
         runtimePalmModel = ModelLoader.Load(palmModelAsset);
@@ -171,48 +179,55 @@ public class sentisHandTracker : MonoBehaviour
             TextureConverter.ToTensor(croppedHandBuffer, inputTensor, nhwcTransform);
             worker.Schedule(inputTensor);
 
-            Vector2[] landMarks = null;
             if (worker.PeekOutput(0) is Tensor<float> outputTensor)
             {
                 using Tensor<float> cpuTensor = outputTensor.ReadbackAndClone();
-                ProcessLandmarks(cpuTensor, handRect, candidate.angle, out landMarks);
+                ProcessLandmarks(cpuTensor, handRect, candidate.angle);
             }
 
-            if (worker.PeekOutput(2) is Tensor<float> direction)
+
+            if (debugBox != null && worker.PeekOutput(2) is Tensor<float> direction)
             {
                 float isRightHand = direction.ReadbackAndClone().DownloadToArray()[0];
                 directionText[h].text = isRightHand < 0.5f ? "Left Hand" : "Right Hand";
             }
 
-            if (landMarks != null)
+
+            if (handLandmarks != null)
             {
                 setHandActive(h, true);
 
                 List<Transform> joints = jointInstancesPerHand[h];
                 List<LineRenderer> fingers = fingersPerHand[h];
 
-                for (int i = 0; i < landMarks.Length && i < joints.Count; i++) joints[i].position = landMarks[i];
+                for (int i = 0; i < handLandmarks.Length && i < joints.Count; i++) joints[i].position = handLandmarks[i];
 
                 for (int f = 0; f < fingers.Count; f++)
                 {
                     for (int p = 0; p < fingerJoints[f].Length; p++)
                     {
                         int landmarkIndex = fingerJoints[f][p];
-                        fingers[f].SetPosition(p, landMarks[landmarkIndex]);
+                        fingers[f].SetPosition(p, handLandmarks[landmarkIndex]);
                     }
                 }
 
-                float screenX = (handRect.x + handRect.width * 0.5f) * Screen.width;
-                float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * Screen.height;
+                int size = Mathf.Max(Screen.width, Screen.height);
+                float offsetX = (Screen.width - size) / 2f;
+                float offsetY = (Screen.height - size) / 2f;
+                float screenX = (handRect.x + handRect.width * 0.5f) * size + offsetX;
+                float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * size + offsetY;
 
                 if (flipCamera) screenX = Screen.width - screenX;
 
-                debugBoxesPerHand[h].gameObject.SetActive(true);
-                debugBoxesPerHand[h].position = new Vector3(screenX, screenY, 0);
-                debugBoxesPerHand[h].sizeDelta = new Vector2(handRect.width * Screen.width, handRect.height * Screen.height);
+                if (debugBox != null)
+                {
+                    debugBoxesPerHand[h].gameObject.SetActive(true);
+                    debugBoxesPerHand[h].position = new Vector3(screenX, screenY, 0);
+                    debugBoxesPerHand[h].sizeDelta = new Vector2(handRect.width * size, handRect.height * size);
 
-                float angleDegrees = candidate.angle * Mathf.Rad2Deg;
-                debugBoxesPerHand[h].localRotation = Quaternion.Euler(0, 0, angleDegrees);
+                    float angleDegrees = candidate.angle * Mathf.Rad2Deg;
+                    debugBoxesPerHand[h].localRotation = Quaternion.Euler(0, 0, angleDegrees);
+                }
             }
             else
             {
@@ -225,7 +240,7 @@ public class sentisHandTracker : MonoBehaviour
     {
         foreach (var j in jointInstancesPerHand[handIndex]) j.gameObject.SetActive(active);
         foreach (var f in fingersPerHand[handIndex]) f.gameObject.SetActive(active);
-        if (!active) debugBoxesPerHand[handIndex].gameObject.SetActive(false);
+        if (!active && debugBox != null) debugBoxesPerHand[handIndex].gameObject.SetActive(false);
     }
 
     Rect ExpandToSquare(Rect box, float scale)
@@ -378,44 +393,48 @@ public class sentisHandTracker : MonoBehaviour
         GL.PopMatrix();
         RenderTexture.active = null;
     }
-    void ProcessLandmarks(Tensor<float> tensorData, Rect appliedCrop, float angleRadians, out Vector2[] worldLandMarks)
+    void ProcessLandmarks(Tensor<float> tensorData, Rect appliedCrop, float angleRadians)
     {
         if (tensorData.count >= 63)
         {
             float[] data = tensorData.DownloadToArray();
-            Vector2[] worldPositions = new Vector2[21];
 
             float sin = Mathf.Sin(-angleRadians);
             float cos = Mathf.Cos(-angleRadians);
 
             Vector2 center = new Vector2(appliedCrop.x + appliedCrop.width * 0.5f, 1f - (appliedCrop.y + appliedCrop.height * 0.5f));
 
+            handLandmarks = new Vector2[21];
             for (int i = 0; i < 63; i += 3)
             {
                 float cropX = data[i] / 224f;
                 float cropY = data[i + 1] / 224f;
+                float cropZ = data[i + 2] / 224f;
 
                 float cx = cropX - 0.5f;
                 float cy = 0.5f - cropY;
 
                 float rotX = cx * cos - cy * sin;
                 float rotY = cx * sin + cy * cos;
+                float rotZ = -cropZ;
 
                 float globalX = center.x + rotX * appliedCrop.width;
                 float globalY = center.y + rotY * appliedCrop.height;
 
-                float screenX = globalX * Screen.width;
-                float screenY = globalY * Screen.height;
+                int size = Mathf.Max(Screen.width, Screen.height);
+                float offsetX = (Screen.width - size) / 2f;
+                float offsetY = (Screen.height - size) / 2f;
 
+                float screenX = (globalX * size) + offsetX;
+                float screenY = (globalY * size) + offsetY;
                 if (flipCamera) screenX = Screen.width - screenX;
 
-                worldPositions[i / 3] = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, 10f));
+                handLandmarks[i / 3] = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, 10f));
             }
-            worldLandMarks = worldPositions;
         }
         else
         {
-            worldLandMarks = null;
+            handLandmarks = null;
         }
     }
 
