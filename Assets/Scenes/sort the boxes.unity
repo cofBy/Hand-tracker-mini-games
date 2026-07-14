@@ -167,10 +167,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 993317972167176943, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
     - target: {fileID: 2141702231717557886, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
       propertyPath: m_Name
       value: elbow
       objectReference: {fileID: 0}
+    - target: {fileID: 5101929391045048618, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -286,6 +294,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 993317972167176943, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
     - target: {fileID: 2141702231717557886, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
       propertyPath: m_Name
       value: hand
@@ -393,7 +405,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   target: {fileID: 1281657766}
   handTracker: {fileID: 348303696}
-  maxSpeed: 100
+  maxSpeed: 5
   maxDistance: 6
   boxPrefab: {fileID: 8389932032766618546, guid: 69ddd75b452b87642a013b7242a9bdb1, type: 3}
   blue: {r: 0.09019608, g: 0.69803923, b: 1, a: 1}
@@ -1167,10 +1179,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 993317972167176943, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
     - target: {fileID: 2141702231717557886, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
       propertyPath: m_Name
       value: shoulder
       objectReference: {fileID: 0}
+    - target: {fileID: 5101929391045048618, guid: f9e60b566ddee184fbb490f636e4fe1d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
