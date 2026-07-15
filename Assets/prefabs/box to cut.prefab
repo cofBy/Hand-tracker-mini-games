@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: 3211312612332233691}
   - component: {fileID: 1163468327875062375}
   - component: {fileID: 7105695170589959649}
+  - component: {fileID: 6554351601353018183}
   m_Layer: 6
-  m_Name: box
+  m_Name: box to cut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -182,3 +183,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::dropShadow
   offset: {x: 0.5, y: -0.5}
   mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}
+--- !u!114 &6554351601353018183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760908985199722467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15638fd737c004b4e8ccc575278c02aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::fruiteBox
+  cutPrefab: {fileID: 1551404020301907431, guid: 6947f1b439d0a684e8a27260ff4bded6, type: 3}
+  cutMat: {fileID: 2100000, guid: 64209950cb8fc0f49b6e7246942cd9fb, type: 2}
+  box: {fileID: 8389932032766618546}

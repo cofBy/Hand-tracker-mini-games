@@ -438,6 +438,12 @@ public class sentisHandTracker : MonoBehaviour
         }
     }
 
+    public Vector2 palmCenter()
+    {
+        if (handLandmarks == null) return new Vector2(0, 0);
+        return Vector3.Lerp(handLandmarks[0], handLandmarks[9], 0.5f);
+    }
+
     private void OnDestroy()
     {
         palmWorker?.Dispose();

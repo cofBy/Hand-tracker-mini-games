@@ -25,8 +25,7 @@ public class sortTheBoxes : MonoBehaviour
     List<SpriteRenderer> boxInstances = new List<SpriteRenderer>();
 
     [Header("score")]
-    public TextMeshProUGUI scoreText;
-    int score;
+    public scoreManager scoreLogic;
 
     private void Update()
     {
@@ -39,9 +38,7 @@ public class sortTheBoxes : MonoBehaviour
 
         if (handTracker == null || handTracker.handLandmarks == null || handTracker.handLandmarks.Length < 1) return;
 
-        Vector3 palmCenter = Vector3.Lerp(handTracker.handLandmarks[0], handTracker.handLandmarks[9], 0.5f);
-
-        Vector3 dir = Vector3.ClampMagnitude(palmCenter - target.position, maxSpeed) * maxSpeed;
+        Vector3 dir = Vector3.ClampMagnitude((Vector3)handTracker.palmCenter() - target.position, maxSpeed) * maxSpeed;
         target.position = Vector3.ClampMagnitude(target.position + dir * Time.deltaTime, maxDistance);
 
         for (int i = 0; i < boxInstances.Count; i++)
@@ -57,7 +54,7 @@ public class sortTheBoxes : MonoBehaviour
             if (boxInstances[i].transform.position.x > maxX)
             {
                 bool isBlue = boxInstances[i].color == blue;
-                score = isBlue ? score + 1 : Mathf.Max(score - 1, 0);
+                scoreLogic.score = isBlue ? scoreLogic.score + 1 : Mathf.Max(scoreLogic.score - 1, 0);
 
                 PoolManager.ReturnToPool(boxInstances[i].gameObject);
                 boxInstances.RemoveAt(i);
@@ -65,13 +62,12 @@ public class sortTheBoxes : MonoBehaviour
             else if (boxInstances[i].transform.position.x < -maxX)
             {
                 bool isRed = boxInstances[i].color == red;
-                score = isRed ? score + 1 : Mathf.Max(score - 1, 0);
+                scoreLogic.score = isRed ? scoreLogic.score + 1 : Mathf.Max(scoreLogic.score - 1, 0);
 
                 PoolManager.ReturnToPool(boxInstances[i].gameObject);
                 boxInstances.RemoveAt(i);
             }
         }
-        scoreText.text = score.ToString();
     }
 
     void spawnBox()
