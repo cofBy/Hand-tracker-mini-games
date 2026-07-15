@@ -1,16 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
-using TMPro;
 
 public class sortTheBoxes : MonoBehaviour
 {
     [Header("getting info")]
-    public Transform target;
     public sentisHandTracker handTracker;
+    Vector3 target;
 
     [Header("moving the target")]
     public float maxSpeed;
     public float maxDistance;
+    public Transform stick;
 
     [Header("boxes")]
     public SpriteRenderer boxPrefab;
@@ -38,8 +38,11 @@ public class sortTheBoxes : MonoBehaviour
 
         if (handTracker == null || handTracker.handLandmarks == null || handTracker.handLandmarks.Length < 1) return;
 
-        Vector3 dir = Vector3.ClampMagnitude((Vector3)handTracker.palmCenter() - target.position, maxSpeed) * maxSpeed;
-        target.position = Vector3.ClampMagnitude(target.position + dir * Time.deltaTime, maxDistance);
+        Vector3 dir = Vector3.ClampMagnitude((Vector3)handTracker.palmCenter() - target, maxSpeed) * maxSpeed;
+        target = Vector3.ClampMagnitude(target + dir * Time.deltaTime, maxDistance);
+
+        float angle = Mathf.Atan2((target - stick.position).y, (target - stick.position).x) * Mathf.Rad2Deg;
+        stick.eulerAngles = new Vector3(0, 0, angle);
 
         for (int i = 0; i < boxInstances.Count; i++)
         {
@@ -54,7 +57,7 @@ public class sortTheBoxes : MonoBehaviour
             if (boxInstances[i].transform.position.x > maxX)
             {
                 bool isBlue = boxInstances[i].color == blue;
-                scoreLogic.score = isBlue ? scoreLogic.score + 1 : Mathf.Max(scoreLogic.score - 1, 0);
+                scoreLogic.score += isBlue ? +1 : -1;
 
                 PoolManager.ReturnToPool(boxInstances[i].gameObject);
                 boxInstances.RemoveAt(i);
@@ -62,7 +65,7 @@ public class sortTheBoxes : MonoBehaviour
             else if (boxInstances[i].transform.position.x < -maxX)
             {
                 bool isRed = boxInstances[i].color == red;
-                scoreLogic.score = isRed ? scoreLogic.score + 1 : Mathf.Max(scoreLogic.score - 1, 0);
+                scoreLogic.score += isRed ? +1 : -1;
 
                 PoolManager.ReturnToPool(boxInstances[i].gameObject);
                 boxInstances.RemoveAt(i);

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7105695170589959649}
   - component: {fileID: 6554351601353018183}
   m_Layer: 6
-  m_Name: box to cut
+  m_Name: fruit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -195,6 +195,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15638fd737c004b4e8ccc575278c02aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::fruiteBox
-  cutPrefab: {fileID: 1551404020301907431, guid: 6947f1b439d0a684e8a27260ff4bded6, type: 3}
+  cutPrefab: {fileID: 8794324443828117530, guid: 6947f1b439d0a684e8a27260ff4bded6, type: 3}
   cutMat: {fileID: 2100000, guid: 64209950cb8fc0f49b6e7246942cd9fb, type: 2}
   box: {fileID: 8389932032766618546}

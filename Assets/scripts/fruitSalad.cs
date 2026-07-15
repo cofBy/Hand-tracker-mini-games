@@ -9,8 +9,8 @@ public class fruitSalad : MonoBehaviour
     float maxTrailTime;
     public float trailLengthSpeed;
 
-    [Header("spawning boxes")]
-    public SpriteRenderer boxPrefab;
+    [Header("spawning fruit")]
+    public SpriteRenderer fruitPrefab;
     public Sprite[] fruitSprites;
 
     public Vector2 range;
@@ -28,6 +28,10 @@ public class fruitSalad : MonoBehaviour
 
     [Header("scoring system")]
     public scoreManager scoringManager;
+
+    [Header("spawning bombs")]
+    public SpriteRenderer bombPrefab;
+    [Range(0, 1)] public float chanceToSpawnBomb;
 
     private void Awake()
     {
@@ -48,7 +52,15 @@ public class fruitSalad : MonoBehaviour
                 Vector2 dir = handTracker.palmCenter() - (Vector2)target.transform.position;
                 float angle = Mathf.Atan2(-dir.x, dir.y) * Mathf.Rad2Deg;
                 box.GetComponent<fruiteBox>().cut(angle);
-                scoringManager.score += 1;
+
+                if (box.gameObject.CompareTag("bomb"))
+                {
+                    scoringManager.score -= 1;
+                }
+                else
+                {
+                    scoringManager.score += 1;
+                }
             }
         }
         else
@@ -61,13 +73,19 @@ public class fruitSalad : MonoBehaviour
         {
             timer = Random.Range(0.5f, timeBetweenBoxes - 1f);
 
+            SpriteRenderer spawnPerfab = Random.Range(0f, 1f) <= chanceToSpawnBomb ? bombPrefab : fruitPrefab; 
+
             Vector2 randomPos = Camera.main.ScreenToWorldPoint(new Vector2(Random.Range(Screen.width / 2 - range.x, Screen.width / 2 + range.x), range.y));
-            SpriteRenderer boxInstance = PoolManager.SpawnObject(boxPrefab, randomPos, Quaternion.identity);
-            boxInstance.sprite = fruitSprites[Random.Range(0, 3)];
+            SpriteRenderer instance = PoolManager.SpawnObject(spawnPerfab, randomPos, Quaternion.identity);
+
+            if (spawnPerfab == fruitPrefab)
+            {
+                instance.sprite = fruitSprites[Random.Range(0, 3)];
+            }
 
             Vector2 dir = new Vector2(Random.Range(minForce.x, maxForce.x), Random.Range(minForce.y, maxForce.y));
 
-            Rigidbody2D rb = boxInstance.GetComponent<Rigidbody2D>();
+            Rigidbody2D rb = instance.GetComponent<Rigidbody2D>();
             rb.AddForce(dir);
             rb.angularVelocity = Random.Range(-90f, 90f);
         }

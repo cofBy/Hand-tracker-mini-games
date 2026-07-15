@@ -992,7 +992,7 @@ MonoBehaviour:
   target: {fileID: 1082048071}
   speed: 20
   trailLengthSpeed: 1
-  boxPrefab: {fileID: 8389932032766618546, guid: 87efdb2724d61664b8b49189b4b73364, type: 3}
+  fruitPrefab: {fileID: 8389932032766618546, guid: 87efdb2724d61664b8b49189b4b73364, type: 3}
   fruitSprites:
   - {fileID: 21300000, guid: 66e5463070949d34e8f23ba46b2c16f3, type: 3}
   - {fileID: 21300000, guid: dbbae2b914f56864f95ef3eb33abee61, type: 3}
@@ -1007,6 +1007,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   scoringManager: {fileID: 1860232412}
+  bombPrefab: {fileID: 8389932032766618546, guid: 136f06c582b50f64b8ac3f9a2d184f37, type: 3}
+  chanceToSpawnBomb: 0.35
 --- !u!114 &1860232412
 MonoBehaviour:
   m_ObjectHideFlags: 0

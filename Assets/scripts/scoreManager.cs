@@ -9,6 +9,7 @@ public class scoreManager : MonoBehaviour
 
     private void Update()
     {
+        score = Mathf.Max(score, 0);
         scoreText.text = score.ToString();
     }
 }
