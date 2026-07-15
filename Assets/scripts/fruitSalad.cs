@@ -55,7 +55,7 @@ public class fruitSalad : MonoBehaviour
 
                 if (box.gameObject.CompareTag("bomb"))
                 {
-                    scoringManager.score -= 1;
+                    scoringManager.timer -= 5;
                 }
                 else
                 {
