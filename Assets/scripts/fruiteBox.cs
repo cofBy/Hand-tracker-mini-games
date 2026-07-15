@@ -3,28 +3,23 @@ using UnityEngine;
 public class fruiteBox : MonoBehaviour
 {
     [Header("cutting particals")]
-    public ParticleSystem cutPrefab;
+    public ParticleSystemRenderer cutPrefab;
     public Material cutMat;
     public SpriteRenderer box;
 
     public void cut(float angle)
     {
-        ParticleSystem rightCut = PoolManager.SpawnObject(cutPrefab, transform.position, Quaternion.Euler(0, 0, angle));
-        ParticleSystem leftCut = rightCut.transform.GetChild(0).GetComponent<ParticleSystem>();
-        ParticleSystem.MainModule rightMain = rightCut.main;
-        ParticleSystem.MainModule leftMain = leftCut.main;
+        ParticleSystemRenderer rightRenderer = PoolManager.SpawnObject(cutPrefab, transform.position, Quaternion.Euler(0, 0, angle));
+        ParticleSystemRenderer leftRenderer = rightRenderer.transform.GetChild(0).GetComponent<ParticleSystemRenderer>();
 
-        rightMain.startColor = box.color;
-        leftMain.startColor = box.color;
+        Material rightMat = new Material(cutMat);
+        rightMat.SetFloat("_angle", angle);
+        rightMat.SetTexture("_MainTex", box.sprite.texture);
+        Material leftMat = new Material(rightMat);
+        leftMat.SetFloat("_angle", -angle);
 
-        Material mat = new Material(cutMat);
-        mat.SetFloat("_angle", angle);
-        mat.SetColor("_Color", box.color);
-
-        ParticleSystemRenderer rightRenderer = rightCut.GetComponent<ParticleSystemRenderer>();
-        ParticleSystemRenderer leftRenderer = leftCut.GetComponent<ParticleSystemRenderer>();
-        rightRenderer.material = mat;
-        leftRenderer.material = mat;
+        rightRenderer.material = rightMat;
+        leftRenderer.material = leftMat;
 
         PoolManager.ReturnToPool(gameObject);
     }

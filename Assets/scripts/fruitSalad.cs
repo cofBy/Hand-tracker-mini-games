@@ -11,7 +11,7 @@ public class fruitSalad : MonoBehaviour
 
     [Header("spawning boxes")]
     public SpriteRenderer boxPrefab;
-    public Gradient color;
+    public Sprite[] fruitSprites;
 
     public Vector2 range;
 
@@ -63,7 +63,7 @@ public class fruitSalad : MonoBehaviour
 
             Vector2 randomPos = Camera.main.ScreenToWorldPoint(new Vector2(Random.Range(Screen.width / 2 - range.x, Screen.width / 2 + range.x), range.y));
             SpriteRenderer boxInstance = PoolManager.SpawnObject(boxPrefab, randomPos, Quaternion.identity);
-            boxInstance.color = color.Evaluate(Random.Range(0f, 1f));
+            boxInstance.sprite = fruitSprites[Random.Range(0, 3)];
 
             Vector2 dir = new Vector2(Random.Range(minForce.x, maxForce.x), Random.Range(minForce.y, maxForce.y));
 

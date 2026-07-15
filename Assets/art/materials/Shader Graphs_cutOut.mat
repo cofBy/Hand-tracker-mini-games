@@ -45,9 +45,9 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _angle: 135.88535
-    - _percentage: 0.5
+    - _percentage: 0.45
     m_Colors:
-    - _Color: {r: 0.18427375, g: 0.756359, b: 0.9528302, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &950780632472615437

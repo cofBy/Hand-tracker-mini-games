@@ -23,6 +23,7 @@ public class mainMenuManager : MonoBehaviour
     public GameObject gamePanel;
     public TextMeshProUGUI gameName, gameDesc;
     public Button playButton;
+    public Button exitButton;
 
     private void Awake()
     {
@@ -38,6 +39,8 @@ public class mainMenuManager : MonoBehaviour
             miniGames[i].playButton.image.sprite = m.icon;
             miniGames[i].playButton.onClick.AddListener(() => setGamePanel(gameIndex));
         }
+
+        exitButton.onClick.AddListener(() => gamePanel.SetActive(false));
     }
 
     void setGamePanel(int index)
