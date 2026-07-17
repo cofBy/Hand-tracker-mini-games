@@ -75,6 +75,7 @@ public class sortTheBoxes : MonoBehaviour
 
     void spawnBox()
     {
+        if (scoreLogic.timer == 0) return;
         Vector2 randomPos = Camera.main.ScreenToWorldPoint(new Vector2(Random.Range(range, Screen.width - range), Screen.height + range));
 
         SpriteRenderer boxInstance = PoolManager.SpawnObject(boxPrefab, randomPos, Quaternion.identity);

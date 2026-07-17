@@ -1,5 +1,7 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class scoreManager : MonoBehaviour
 {
@@ -10,6 +12,19 @@ public class scoreManager : MonoBehaviour
     [Header("timer")]
     public TextMeshPro timerText;
     public float timer;
+
+    [Header("UI")]
+    public GameObject gameOverPanel;
+    public Button again;
+    public Button maneMenu;
+    public TextMeshProUGUI scoreMeter;
+
+    private void Start()
+    {
+        gameOverPanel.SetActive(false);
+        maneMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
+        again.onClick.AddListener(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
+    }
     private void Update()
     {
         score = Mathf.Max(score, 0);
@@ -18,5 +33,10 @@ public class scoreManager : MonoBehaviour
         timer -= Time.deltaTime;
         timer = Mathf.Max(timer, 0);
         timerText.text = Mathf.Round(timer).ToString();
+        if (timer == 0)
+        {
+            gameOverPanel.SetActive(true);
+            scoreMeter.text = ("score : " + score).ToString();
+        }
     }
 }

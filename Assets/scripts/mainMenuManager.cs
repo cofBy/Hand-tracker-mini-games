@@ -1,8 +1,9 @@
-using UnityEngine.UI;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Android;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class mainMenuManager : MonoBehaviour
 {
@@ -25,6 +26,11 @@ public class mainMenuManager : MonoBehaviour
     public Button playButton;
     public Button exitButton;
 
+    [Header("taking camera permission")]
+    public GameObject getPermissionPanel;
+    public Button givePermission;
+    public Button Quit;
+
     private void Awake()
     {
         gamePanel.SetActive(false);
@@ -43,6 +49,30 @@ public class mainMenuManager : MonoBehaviour
         exitButton.onClick.AddListener(() => gamePanel.SetActive(false));
     }
 
+    private void Start()
+    {
+
+#if PLATFORM_ANDROID
+        if (Permission.HasUserAuthorizedPermission(Permission.Camera))
+        {
+            getPermissionPanel.SetActive(false);
+        }
+        else
+        {
+            getPermissionPanel.SetActive(true);
+            givePermission.onClick.AddListener(giveCameraPermission);
+            Quit.onClick.AddListener(() => Application.Quit());
+        }
+#else
+        getPermissionPanel.SetActive(false);
+#endif
+    }
+
+    void giveCameraPermission()
+    {
+        Permission.RequestUserPermission(Permission.Camera);
+        getPermissionPanel.SetActive(false);
+    }
     void setGamePanel(int index)
     {
         gamePanel.SetActive(true);

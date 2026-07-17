@@ -71,23 +71,30 @@ public class fruitSalad : MonoBehaviour
         timer += Time.deltaTime;
         if (timer > timeBetweenBoxes)
         {
-            timer = Random.Range(0.5f, timeBetweenBoxes - 1f);
-
-            SpriteRenderer spawnPerfab = Random.Range(0f, 1f) <= chanceToSpawnBomb ? bombPrefab : fruitPrefab; 
-
-            Vector2 randomPos = Camera.main.ScreenToWorldPoint(new Vector2(Random.Range(Screen.width / 2 - range.x, Screen.width / 2 + range.x), range.y));
-            SpriteRenderer instance = PoolManager.SpawnObject(spawnPerfab, randomPos, Quaternion.identity);
-
-            if (spawnPerfab == fruitPrefab)
-            {
-                instance.sprite = fruitSprites[Random.Range(0, 3)];
-            }
-
-            Vector2 dir = new Vector2(Random.Range(minForce.x, maxForce.x), Random.Range(minForce.y, maxForce.y));
-
-            Rigidbody2D rb = instance.GetComponent<Rigidbody2D>();
-            rb.AddForce(dir);
-            rb.angularVelocity = Random.Range(-90f, 90f);
+            spawnFruit();
         }
+    }
+
+    void spawnFruit()
+    {
+        if (scoringManager.timer == 0) return;
+
+        timer = Random.Range(0.5f, timeBetweenBoxes - 1f);
+
+        SpriteRenderer spawnPerfab = Random.Range(0f, 1f) <= chanceToSpawnBomb ? bombPrefab : fruitPrefab;
+
+        Vector2 randomPos = Camera.main.ScreenToWorldPoint(new Vector2(Random.Range(Screen.width / 2 - range.x, Screen.width / 2 + range.x), range.y));
+        SpriteRenderer instance = PoolManager.SpawnObject(spawnPerfab, randomPos, Quaternion.identity);
+
+        if (spawnPerfab == fruitPrefab)
+        {
+            instance.sprite = fruitSprites[Random.Range(0, 3)];
+        }
+
+        Vector2 dir = new Vector2(Random.Range(minForce.x, maxForce.x), Random.Range(minForce.y, maxForce.y));
+
+        Rigidbody2D rb = instance.GetComponent<Rigidbody2D>();
+        rb.AddForce(dir);
+        rb.angularVelocity = Random.Range(-90f, 90f);
     }
 }

@@ -9,10 +9,10 @@ EditorBuildSettings:
     path: Assets/Scenes/mane menu.unity
     guid: a8ffae75356ff1c4db2fc1c7104b5c8f
   - enabled: 1
-    path: Assets/Scenes/sort the boxes.unity
+    path: Assets/Scenes/mini games/sort the boxes.unity
     guid: 8a1290fb4b213df4da4a110734c4f206
   - enabled: 1
-    path: Assets/Scenes/fruit salad.unity
+    path: Assets/Scenes/mini games/fruit salad.unity
     guid: 55fb8cca6eebab64690d90fad7302ffe
   - enabled: 1
     path: Assets/Scenes/tracker testing ground.unity

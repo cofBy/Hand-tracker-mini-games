@@ -71,10 +71,24 @@ public class sentisHandTracker : MonoBehaviour
 
     private void Start()
     {
-        blitMaterial = new Material(Shader.Find("Hidden/BlitCopy"));
+        Shader blitCopy = Shader.Find("Hidden/BlitCopy");
+        Debug.Log(blitCopy);
+        blitMaterial = new Material(blitCopy);
 
-        webCam = new WebCamTexture(512, 512);
+        WebCamDevice? frontCam = null;
+        foreach (WebCamDevice d in WebCamTexture.devices)
+        {
+            if (d.isFrontFacing)
+            {
+                frontCam = d;
+                break;
+            }
+        }
+        WebCamDevice device = frontCam ?? WebCamTexture.devices[0];
+        webCam = new WebCamTexture(device.name, 320, 240, 15);
         webCam.Play();
+        flipCamera = device.isFrontFacing;
+
         if (cameraFeed != null)
         {
             cameraFeed.texture = webCam;
@@ -113,14 +127,14 @@ public class sentisHandTracker : MonoBehaviour
         }
 
         runtimePalmModel = ModelLoader.Load(palmModelAsset);
-        palmWorker = new Worker(runtimePalmModel, BackendType.GPUCompute);
+        palmWorker = new Worker(runtimePalmModel, BackendType.CPU);
         palmInputTensor = new Tensor<float>(new TensorShape(1, 192, 192, 3));
         nhwcTransform = new TextureTransform().SetTensorLayout(TensorLayout.NHWC);
 
         anchors = GeneratePalmAnchors();
 
         runtimeModel = ModelLoader.Load(model);
-        worker = new Worker(runtimeModel, BackendType.GPUCompute);
+        worker = new Worker(runtimeModel, BackendType.CPU);
         inputTensor = new Tensor<float>(new TensorShape(1, 224, 224, 3));
 
         croppedHandBuffer = new RenderTexture(224, 224, 0, RenderTextureFormat.ARGB32);
@@ -154,7 +168,6 @@ public class sentisHandTracker : MonoBehaviour
     private void Update()
     {
         if (webCam == null || !webCam.didUpdateThisFrame) return;
-        flipCamera = WebCamTexture.devices[0].isFrontFacing;
 
         List<Candidate> handCandidates = PerformPalmDetection();
 
@@ -185,13 +198,12 @@ public class sentisHandTracker : MonoBehaviour
                 ProcessLandmarks(cpuTensor, handRect, candidate.angle);
             }
 
-
             if (debugBox != null && worker.PeekOutput(2) is Tensor<float> direction)
             {
-                float isRightHand = direction.ReadbackAndClone().DownloadToArray()[0];
+                using Tensor<float> directionCpu = direction.ReadbackAndClone();
+                float isRightHand = directionCpu.DownloadToArray()[0];
                 directionText[h].text = isRightHand < 0.5f ? "Left Hand" : "Right Hand";
             }
-
 
             if (handLandmarks != null)
             {
@@ -314,8 +326,8 @@ public class sentisHandTracker : MonoBehaviour
 
             float cx = landMarks[0].x;
             float cy = landMarks[0].y;
-            float w  = landMarks[1].x - anchors[i].x;
-            float h  = landMarks[2].y - anchors[i].y;
+            float w = landMarks[1].x - anchors[i].x;
+            float h = landMarks[2].y - anchors[i].y;
 
             float xMin = Mathf.Clamp01(cx - w * 0.5f);
             float yMin = Mathf.Clamp01(cy - h * 0.5f);
@@ -450,6 +462,12 @@ public class sentisHandTracker : MonoBehaviour
         worker?.Dispose();
         palmInputTensor?.Dispose();
         inputTensor?.Dispose();
+
+        if (webCam != null)
+        {
+            webCam.Stop();
+            Destroy(webCam);
+        }
 
         if (blitMaterial != null) Destroy(blitMaterial);
 
