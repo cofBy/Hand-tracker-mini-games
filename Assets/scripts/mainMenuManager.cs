@@ -31,15 +31,11 @@ public class mainMenuManager : MonoBehaviour
     public Button givePermission;
     public Button Quit;
 
-    [Header("using handTracking in UI")]
-    public sentisHandTracker handTracker;
-
     private void Awake()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         gamePanel.SetActive(false);
-        handTracker.gameObject.SetActive(false);
         for (int i = 0; i < miniGames.Count; i++)
         {
             Button buttonInstance = Instantiate(playButtonPrefab, gamesParent);

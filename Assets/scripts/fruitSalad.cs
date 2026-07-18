@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class fruitSalad : MonoBehaviour
@@ -28,6 +29,7 @@ public class fruitSalad : MonoBehaviour
 
     [Header("scoring system")]
     public scoreManager scoringManager;
+    List<GameObject> spawned = new List<GameObject>();
 
     [Header("spawning bombs")]
     public SpriteRenderer bombPrefab;
@@ -73,6 +75,14 @@ public class fruitSalad : MonoBehaviour
         {
             spawnFruit();
         }
+        if (scoringManager)
+        {
+            foreach (GameObject instance in spawned)
+            {
+                Destroy(instance);
+            }
+            spawned.Clear();
+        }
     }
 
     void spawnFruit()
@@ -85,6 +95,7 @@ public class fruitSalad : MonoBehaviour
 
         Vector2 randomPos = Camera.main.ScreenToWorldPoint(new Vector2(Random.Range(Screen.width / 2 - range.x, Screen.width / 2 + range.x), range.y));
         SpriteRenderer instance = PoolManager.SpawnObject(spawnPerfab, randomPos, Quaternion.identity);
+        spawned.Add(instance.gameObject);
 
         if (spawnPerfab == fruitPrefab)
         {
