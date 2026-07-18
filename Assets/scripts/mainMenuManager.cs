@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Android;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class mainMenuManager : MonoBehaviour
@@ -83,6 +82,6 @@ public class mainMenuManager : MonoBehaviour
     }
     void playGame(int index)
     {
-        SceneManager.LoadScene(index + 1);
+        FEEL.gotoScene(index + 1, this);
     }
 }

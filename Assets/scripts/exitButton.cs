@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class exitButton : MonoBehaviour
@@ -9,6 +8,6 @@ public class exitButton : MonoBehaviour
 
     private void Awake()
     {
-        quitButton.onClick.AddListener(() => SceneManager.LoadScene(0));
+        quitButton.onClick.AddListener(() => FEEL.gotoScene(0, this));
     }
 }

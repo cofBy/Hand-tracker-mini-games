@@ -22,8 +22,8 @@ public class scoreManager : MonoBehaviour
     private void Start()
     {
         gameOverPanel.SetActive(false);
-        maneMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
-        again.onClick.AddListener(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
+        maneMenu.onClick.AddListener(() => FEEL.gotoScene(0, this));
+        again.onClick.AddListener(() => FEEL.gotoScene(SceneManager.GetActiveScene().buildIndex, this));
     }
     private void Update()
     {

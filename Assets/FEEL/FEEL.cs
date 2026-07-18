@@ -1,14 +1,35 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FEEL : MonoBehaviour
 {
     public Sound[] PublicSounds;
     public static Sound[] sounds;
 
+    [Header("transition")]
+    public Material publicTransitionMat;
+    public static Material transitionMat;
+    static int timeIndex;
+
+    public float durationSeconds;
+    public static float duration;
+
+    public bool atStart = true;
+
     private void Awake()
     {
+        transitionMat = publicTransitionMat;
+        timeIndex = Shader.PropertyToID("_time");
+
+        duration = durationSeconds;
+
+        if (atStart)
+        {
+            StartCoroutine(startTransition());
+        }
+
         sounds = PublicSounds;
         foreach (Sound s in sounds)
         {
@@ -35,6 +56,45 @@ public class FEEL : MonoBehaviour
     public static void Particals(GameObject obj, Vector3 pos, Quaternion rot)
     {
         PoolManager.spawnObject(obj, pos, rot, PoolManager.PoolType.Particals);
+    }
+
+    public static void gotoScene(int sceneIndex, MonoBehaviour runner)
+    {
+        runner.StartCoroutine(sceneEnumerator(sceneIndex));
+    }
+
+    IEnumerator startTransition()
+    {
+        transitionMat.SetFloat(timeIndex, 0);
+
+        yield return new WaitForSeconds(duration);  
+
+        float timer = 0;
+        while (timer >= -duration)
+        {
+            timer -= Time.deltaTime;
+            transitionMat.SetFloat(timeIndex, timer / duration);
+
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        transitionMat.SetFloat(timeIndex, -1);
+    }
+
+    static IEnumerator sceneEnumerator(int sceneIndex)
+    {
+        float timer = duration;
+        while (timer >= 0)
+        {
+            timer -= Time.deltaTime;
+            transitionMat.SetFloat(timeIndex, timer / duration);
+
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+
+        transitionMat.SetFloat(timeIndex, 0);
+        yield return null;
+
+        SceneManager.LoadScene(sceneIndex);
     }
 
     public static IEnumerator Flash(Renderer rend, Material flashMaterial, float duration)
