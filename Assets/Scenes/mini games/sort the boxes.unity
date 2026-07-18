@@ -303,7 +303,6 @@ MonoBehaviour:
   debugBox: {fileID: 0}
   croppedPalm: {fileID: 0}
   cameraFeed: {fileID: 0}
-  flipCamera: 1
 --- !u!1 &463064940
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,9 +1,10 @@
-using Unity.InferenceEngine;
-using UnityEngine;
-using UnityEngine.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.InferenceEngine;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class sentisHandTracker : MonoBehaviour
 {
@@ -44,6 +45,11 @@ public class sentisHandTracker : MonoBehaviour
     [Header("info")]
     public Vector2[] handLandmarks = new Vector2[21];
 
+    [Header("rotating camera")]
+    RenderTexture rotatedCam;
+    float cameraAngle;
+    WebCamDevice flipCamera;
+
     [Header("Debugging")]
     public RectTransform debugBox;
     List<RectTransform> debugBoxesPerHand = new List<RectTransform>();
@@ -51,7 +57,6 @@ public class sentisHandTracker : MonoBehaviour
     List<TextMeshProUGUI> fistText = new List<TextMeshProUGUI>();
     public RawImage croppedPalm;
     public RawImage cameraFeed;
-    public bool flipCamera;
 
     int[][] fingerJoints = new int[][]
     {
@@ -71,9 +76,7 @@ public class sentisHandTracker : MonoBehaviour
 
     private void Start()
     {
-        Shader blitCopy = Shader.Find("Hidden/BlitCopy");
-        Debug.Log(blitCopy);
-        blitMaterial = new Material(blitCopy);
+        blitMaterial = new Material(Shader.Find("Hidden/BlitCopy"));
 
         WebCamDevice? frontCam = null;
         foreach (WebCamDevice d in WebCamTexture.devices)
@@ -87,12 +90,12 @@ public class sentisHandTracker : MonoBehaviour
         WebCamDevice device = frontCam ?? WebCamTexture.devices[0];
         webCam = new WebCamTexture(device.name, 320, 240, 15);
         webCam.Play();
-        flipCamera = device.isFrontFacing;
+        flipCamera = device;
 
         if (cameraFeed != null)
         {
             cameraFeed.texture = webCam;
-            if (flipCamera) cameraFeed.uvRect = new Rect(1, 0, -1, 1);
+            if (flipCamera.isFrontFacing) cameraFeed.uvRect = new Rect(1, 0, -1, 1);
         }
 
         for (int h = 0; h < maxHands; h++)
@@ -139,6 +142,8 @@ public class sentisHandTracker : MonoBehaviour
 
         croppedHandBuffer = new RenderTexture(224, 224, 0, RenderTextureFormat.ARGB32);
         if (croppedPalm != null) croppedPalm.texture = croppedHandBuffer;
+
+        rotatedCam = new RenderTexture(320, 240, 0, RenderTextureFormat.ARGB32);
     }
     List<Vector2> GeneratePalmAnchors()
     {
@@ -168,8 +173,11 @@ public class sentisHandTracker : MonoBehaviour
     private void Update()
     {
         if (webCam == null || !webCam.didUpdateThisFrame) return;
+        cameraAngle = webCam.videoRotationAngle * Mathf.Deg2Rad;
 
-        List<Candidate> handCandidates = PerformPalmDetection();
+        blitRotation(webCam, rotatedCam, cameraAngle);
+
+        List<Candidate> handCandidates = PerformPalmDetection(rotatedCam);
 
         for (int h = 0; h < maxHands; h++)
         {
@@ -188,7 +196,7 @@ public class sentisHandTracker : MonoBehaviour
                 continue;
             }
 
-            CropHandRegion(webCam, handRect, candidate.angle);
+            CropHandRegion(rotatedCam, handRect, candidate.angle);
             TextureConverter.ToTensor(croppedHandBuffer, inputTensor, nhwcTransform);
             worker.Schedule(inputTensor);
 
@@ -229,7 +237,7 @@ public class sentisHandTracker : MonoBehaviour
                 float screenX = (handRect.x + handRect.width * 0.5f) * size + offsetX;
                 float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * size + offsetY;
 
-                if (flipCamera) screenX = Screen.width - screenX;
+                if (flipCamera.isFrontFacing) screenX = Screen.width - screenX;
 
                 if (debugBox != null)
                 {
@@ -268,9 +276,9 @@ public class sentisHandTracker : MonoBehaviour
         float y = Mathf.Clamp(cy - size * 0.5f, 0, 1 - size);
         return new Rect(x, y, size, size);
     }
-    List<Candidate> PerformPalmDetection()
+    List<Candidate> PerformPalmDetection(RenderTexture texture)
     {
-        TextureConverter.ToTensor(webCam, palmInputTensor, nhwcTransform);
+        TextureConverter.ToTensor(texture, palmInputTensor, nhwcTransform);
         palmWorker.Schedule(palmInputTensor);
 
         Tensor<float> rawBoxes = palmWorker.PeekOutput(0) as Tensor<float>;
@@ -405,14 +413,54 @@ public class sentisHandTracker : MonoBehaviour
         GL.PopMatrix();
         RenderTexture.active = null;
     }
+    void blitRotation(Texture sourceTex, RenderTexture dest, float angleRadians)
+    {
+        RenderTexture.active = dest;
+        GL.Clear(true, true, Color.clear);
+        GL.PushMatrix();
+        GL.LoadOrtho();
+
+        blitMaterial.mainTexture = sourceTex;
+        blitMaterial.SetPass(0);
+
+        Vector2 center = new Vector2(0.5f, 0.5f);
+        Vector2[] localCorners =
+        {
+            new Vector2(-0.5f, -0.5f),
+            new Vector2( 0.5f, -0.5f),
+            new Vector2( 0.5f,  0.5f),
+            new Vector2(-0.5f,  0.5f)
+        };
+
+        float sin = Mathf.Sin(angleRadians);
+        float cos = Mathf.Cos(angleRadians);
+
+        GL.Begin(GL.QUADS);
+        for (int i = 0; i < 4; i++)
+        {
+            float rotX = localCorners[i].x * cos - localCorners[i].y * sin;
+            float rotY = localCorners[i].x * sin + localCorners[i].y * cos;
+            Vector2 uv = center + new Vector2(rotX, rotY);
+
+            GL.TexCoord2(uv.x, uv.y);
+            if (i == 0) GL.Vertex3(0, 0, 0);
+            if (i == 1) GL.Vertex3(1, 0, 0);
+            if (i == 2) GL.Vertex3(1, 1, 0);
+            if (i == 3) GL.Vertex3(0, 1, 0);
+        }
+        GL.End();
+
+        GL.PopMatrix();
+        RenderTexture.active = null;
+    }
     void ProcessLandmarks(Tensor<float> tensorData, Rect appliedCrop, float angleRadians)
     {
         if (tensorData.count >= 63)
         {
             float[] data = tensorData.DownloadToArray();
 
-            float sin = Mathf.Sin(-angleRadians);
             float cos = Mathf.Cos(-angleRadians);
+            float sin = Mathf.Sin(-angleRadians);
 
             Vector2 center = new Vector2(appliedCrop.x + appliedCrop.width * 0.5f, 1f - (appliedCrop.y + appliedCrop.height * 0.5f));
 
@@ -439,7 +487,7 @@ public class sentisHandTracker : MonoBehaviour
 
                 float screenX = (globalX * size) + offsetX;
                 float screenY = (globalY * size) + offsetY;
-                if (flipCamera) screenX = Screen.width - screenX;
+                if (flipCamera.isFrontFacing) screenX = Screen.width - screenX;
 
                 handLandmarks[i / 3] = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, 10f));
             }

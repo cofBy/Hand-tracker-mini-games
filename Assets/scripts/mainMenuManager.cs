@@ -31,9 +31,15 @@ public class mainMenuManager : MonoBehaviour
     public Button givePermission;
     public Button Quit;
 
+    [Header("using handTracking in UI")]
+    public sentisHandTracker handTracker;
+
     private void Awake()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         gamePanel.SetActive(false);
+        handTracker.gameObject.SetActive(false);
         for (int i = 0; i < miniGames.Count; i++)
         {
             Button buttonInstance = Instantiate(playButtonPrefab, gamesParent);
@@ -45,7 +51,6 @@ public class mainMenuManager : MonoBehaviour
             miniGames[i].playButton.image.sprite = m.icon;
             miniGames[i].playButton.onClick.AddListener(() => setGamePanel(gameIndex));
         }
-
         exitButton.onClick.AddListener(() => gamePanel.SetActive(false));
     }
 
@@ -53,14 +58,10 @@ public class mainMenuManager : MonoBehaviour
     {
 
 #if PLATFORM_ANDROID
-        if (Permission.HasUserAuthorizedPermission(Permission.Camera))
-        {
-            getPermissionPanel.SetActive(false);
-        }
-        else
+        if (Permission.HasUserAuthorizedPermission(Permission.Camera) == false)
         {
             getPermissionPanel.SetActive(true);
-            givePermission.onClick.AddListener(giveCameraPermission);
+            givePermission.onClick.AddListener(() => Permission.RequestUserPermission(Permission.Camera));
             Quit.onClick.AddListener(() => Application.Quit());
         }
 #else
@@ -68,11 +69,14 @@ public class mainMenuManager : MonoBehaviour
 #endif
     }
 
-    void giveCameraPermission()
+    private void Update()
     {
-        Permission.RequestUserPermission(Permission.Camera);
-        getPermissionPanel.SetActive(false);
+        if (Permission.HasUserAuthorizedPermission(Permission.Camera))
+        {
+            getPermissionPanel.SetActive(false);
+        }
     }
+
     void setGamePanel(int index)
     {
         gamePanel.SetActive(true);
