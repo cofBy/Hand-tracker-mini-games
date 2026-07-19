@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 195a61483adb79a4aa0fa48c8a70bbb2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - carMat: {fileID: 2100000, guid: 7c25471febd9ce84490a6cf26b6c0361, type: 2}
+  - carSprite: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

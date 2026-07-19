@@ -23,6 +23,9 @@ public class dropShadow : MonoBehaviour
         shadowRenderer.material = mat;
         shadowRenderer.sortingLayerName = renderer.sortingLayerName;
         shadowRenderer.sortingOrder = renderer.sortingOrder - 1;
+
+        shadowRenderer.drawMode = renderer.drawMode;
+        shadowRenderer.size = renderer.size;
     }
     private void Update()
     {

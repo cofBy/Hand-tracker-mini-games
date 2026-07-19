@@ -75,7 +75,7 @@ public class fruitSalad : MonoBehaviour
         {
             spawnFruit();
         }
-        if (scoringManager)
+        if (scoringManager.timer == 0)
         {
             foreach (GameObject instance in spawned)
             {
