@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 public class Point : MonoBehaviour
 {
@@ -8,10 +9,10 @@ public class Point : MonoBehaviour
     [Header("Chain")]
     public bool autoDistance;
 
-    public segment[] Segments;
+    public List<segment> Segments;
 
     Vector3[] SegmentPlaces;
-    Vector3 LastPlace;
+    [HideInInspector]public Vector3 LastPlace;
     public enum RH { None, Up, Down, Left, Right, Forword, Backward}
     public RH RoationUp;
 
@@ -37,29 +38,43 @@ public class Point : MonoBehaviour
     private void Start()
     {
         started = true;
-        SegmentPlaces = new Vector3[Segments.Length];
+        SegmentPlaces = new Vector3[Segments.Count];
         for (int i = 0; i < SegmentPlaces.Length; i++)
         {
             SegmentPlaces[i] = Segments[i].transform.position;
         }
 
-        LastPlace = ConstraintDistance(LastPlace, Segments[Segments.Length - 1].transform.position, Segments[Segments.Length - 1].distance);
+        if (SegmentPlaces.Length <= 0) return;
+        LastPlace = ConstraintDistance(LastPlace, Segments[Segments.Count - 1].transform.position, Segments[Segments.Count - 1].distance);
     }
 
     private void LateUpdate()
     {
         // sets the shoulder - head
+        if (SegmentPlaces.Length <= 0 || Segments.Count <= 0) return;
+        
+        if (SegmentPlaces.Length != Segments.Count)
+        {
+            Vector3[] newPlaces = new Vector3[SegmentPlaces.Length + 1];
+            for (int i = 0; i < SegmentPlaces.Length; i++)
+            {
+                newPlaces[i] = SegmentPlaces[i];
+            }
+            newPlaces[newPlaces.Length - 1] = LastPlace;
+            SegmentPlaces = newPlaces;
+        }
+
         SegmentPlaces[0] = Anchor.position;
         Segments[0].transform.position = SegmentPlaces[0];
 
         Rotate(Segments[0].transform, SegmentPlaces[1]);
 
         // Chain DC
-        for (int i = 1; i < Segments.Length; i++)
+        for (int i = 1; i < Segments.Count; i++)
         {
             SegmentPlaces[i] = ConstraintDistance(SegmentPlaces[i], SegmentPlaces[i - 1], Segments[i].distance);
             Segments[i].transform.position += SegmentPlaces[i] - Segments[i].transform.position;
-            if (i < Segments.Length - 1)
+            if (i < Segments.Count - 1)
             {
                 Rotate(Segments[i].transform, SegmentPlaces[i + 1]);
             }
@@ -85,9 +100,9 @@ public class Point : MonoBehaviour
         if (DoFABRIK == true)
         {
             SegmentPlaces[SegmentPlaces.Length - 1] = EndEffector();
-            Segments[Segments.Length - 1].transform.position = SegmentPlaces[SegmentPlaces.Length - 1];
+            Segments[Segments.Count - 1].transform.position = SegmentPlaces[SegmentPlaces.Length - 1];
 
-            for (int i = Segments.Length - 1; i > 0; i--)
+            for (int i = Segments.Count - 1; i > 0; i--)
             {
                 SegmentPlaces[i - 1] = ConstraintDistance(SegmentPlaces[i - 1], SegmentPlaces[i], Segments[i].distance);
                 Segments[i - 1].transform.position = SegmentPlaces[i - 1];
@@ -99,8 +114,8 @@ public class Point : MonoBehaviour
         }
         else
         {
-            LastPlace = ConstraintDistance(LastPlace, SegmentPlaces[SegmentPlaces.Length - 1], Segments[Segments.Length - 1].distance);
-            Rotate(Segments[Segments.Length - 1].transform, LastPlace);
+            LastPlace = ConstraintDistance(LastPlace, SegmentPlaces[SegmentPlaces.Length - 1], Segments[Segments.Count - 1].distance);
+            Rotate(Segments[Segments.Count - 1].transform, LastPlace);
         }
 
     }
@@ -199,7 +214,7 @@ public class Point : MonoBehaviour
         float distanceSum = 0;
         if (DrawPointDistance == true)
         {
-            for (int i = 1; i < Segments.Length; i++)
+            for (int i = 1; i < Segments.Count; i++)
             {
                 distanceSum += Segments[i].distance;
                 Gizmos.DrawWireSphere(Segments[i].transform.position, Segments[i].distance);
@@ -214,7 +229,7 @@ public class Point : MonoBehaviour
                 Gizmos.DrawWireSphere(Anchor.position, distanceSum);
             }
 
-            for (int i = 1; i < Segments.Length; i++)
+            for (int i = 1; i < Segments.Count; i++)
             {
                 if (DrawLimbs == true && started == true)
                 {
@@ -225,9 +240,9 @@ public class Point : MonoBehaviour
             if (PoleObject != null & DrawPoleVector == true)
             {
                 Gizmos.color = Color.yellow;
-                Vector3 Dir = Segments[Segments.Length - 1].transform.position - Segments[0].transform.position;
+                Vector3 Dir = Segments[Segments.Count - 1].transform.position - Segments[0].transform.position;
 
-                Vector3 med = Vector3.Lerp(Segments[Segments.Length - 1].transform.position, Segments[0].transform.position, 0.5f);
+                Vector3 med = Vector3.Lerp(Segments[Segments.Count - 1].transform.position, Segments[0].transform.position, 0.5f);
 
                 Gizmos.DrawRay(transform.position, Dir);
                 Gizmos.DrawRay(med, (PoleObject.transform.position - med).normalized);
@@ -237,7 +252,7 @@ public class Point : MonoBehaviour
     Vector3 EndEffector()
     {
         float MaxDistance = 0;
-        for (int i = 0; i < Segments.Length-1; i++)
+        for (int i = 0; i < Segments.Count -1; i++)
         {
             MaxDistance += Segments[i].distance;
         }
@@ -257,16 +272,16 @@ public class Point : MonoBehaviour
         public Transform transform;
         public float distance;
     }
-
     private void OnValidate()
     {
-        if (autoDistance == true && started == false)
+        if (autoDistance == false || started == true || Segments.Count <= 0) return;
+
+        for (int i = 0; i < Segments.Count - 1; i++)
         {
-            for (int i = 0; i < Segments.Length - 1; i++)
-            {
-                Segments[i].distance = Vector3.Distance(Segments[i].transform.position, Segments[i + 1].transform.position);
-            }
-            Segments[Segments.Length - 1].distance = Vector3.Distance(Segments[Segments.Length - 1].transform.position, Segments[Segments.Length - 2].transform.position);
+            segment newSegment = new segment { transform = Segments[i].transform, distance = Vector3.Distance(Segments[i].transform.position, Segments[i + 1].transform.position) };
+            Segments[i] = newSegment;
         }
+        segment lastSegment = new segment { transform = Segments[Segments.Count - 1].transform, distance = Vector3.Distance(Segments[Segments.Count - 1].transform.position, Segments[Segments.Count - 2].transform.position) };
+        Segments[Segments.Count - 1] = lastSegment;
     }
 }
