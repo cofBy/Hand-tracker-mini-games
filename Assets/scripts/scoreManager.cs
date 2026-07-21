@@ -36,7 +36,7 @@ public class scoreManager : MonoBehaviour
         if (timer == 0)
         {
             gameOverPanel.SetActive(true);
-            scoreMeter.text = ("score : " + score).ToString();
+            scoreMeter.text = ("score : " + Mathf.Round(score)).ToString();
         }
     }
 }

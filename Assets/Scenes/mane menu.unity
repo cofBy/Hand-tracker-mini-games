@@ -2159,7 +2159,8 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 09b253245142ba941847b9e9f2903482, type: 3}
     playButton: {fileID: 0}
   - name: bumper cars
-    description: bumb your car onto other cars to score a point
+    description: bump into other cars to gain points. you lose points if a cars bump
+      into yours
     icon: {fileID: 21300000, guid: 09b253245142ba941847b9e9f2903482, type: 3}
     playButton: {fileID: 0}
   gamePanel: {fileID: 1490300323}

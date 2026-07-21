@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: player car
       objectReference: {fileID: 0}
+    - target: {fileID: 3255481247446224911, guid: 555b274777169f648979b69f92d26e94, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3517734187448971964, guid: 555b274777169f648979b69f92d26e94, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -183,6 +187,10 @@ PrefabInstance:
       propertyPath: handTracker
       value: 
       objectReference: {fileID: 789634478}
+    - target: {fileID: 4160945522104540014, guid: 555b274777169f648979b69f92d26e94, type: 3}
+      propertyPath: scoringSystem
+      value: 
+      objectReference: {fileID: 200355834}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -294,6 +302,17 @@ Canvas:
   m_CorrespondingSourceObject: {fileID: 6443995420025559183, guid: 3553de2680fe99c42aff86702e67071d, type: 3}
   m_PrefabInstance: {fileID: 200355832}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &200355834 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8587586441986084342, guid: 3553de2680fe99c42aff86702e67071d, type: 3}
+  m_PrefabInstance: {fileID: 200355832}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 608d51820ac65ea48aa7fbf836ad8c1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::scoreManager
 --- !u!1001 &484682956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -626,9 +645,10 @@ GameObject:
   - component: {fileID: 1006044620}
   - component: {fileID: 1006044622}
   - component: {fileID: 1006044623}
+  - component: {fileID: 1006044624}
   m_Layer: 0
   m_Name: bounds
-  m_TagString: Untagged
+  m_TagString: bounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -735,11 +755,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   enemyCar: {fileID: 8705139331807336641, guid: b8e19c8125ea16e45a090155f6252244, type: 3}
-  enemyCarsAmount: 6
+  enemyCarsAmount: 5
   playerCar: {fileID: 713157715}
   cam: {fileID: 519420031}
   followTime: 0.3
-  lookAhead: 5
+  lookAhead: 7
+  scoringSystem: {fileID: 200355834}
 --- !u!68 &1006044623
 EdgeCollider2D:
   m_ObjectHideFlags: 0
@@ -775,17 +796,44 @@ EdgeCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0.25
+  m_EdgeRadius: 10
   m_Points:
-  - {x: 10, y: 10}
-  - {x: 10, y: -10}
-  - {x: -10, y: -10}
-  - {x: -10, y: 10}
-  - {x: 10, y: 10}
+  - {x: 16.5, y: 16.5}
+  - {x: 16.5, y: -16.5}
+  - {x: -16.5, y: -16.5}
+  - {x: -16.5, y: 16.5}
+  - {x: 16.5, y: 16.5}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
   m_UseAdjacentEndPoint: 0
+--- !u!50 &1006044624
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006044617}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 7
 --- !u!1 &1266623212
 GameObject:
   m_ObjectHideFlags: 0

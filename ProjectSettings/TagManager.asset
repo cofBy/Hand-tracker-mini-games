@@ -6,6 +6,7 @@ TagManager:
   tags:
   - bomb
   - car
+  - bounds
   layers:
   - Default
   - TransparentFX
