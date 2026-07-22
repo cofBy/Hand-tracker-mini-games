@@ -2163,6 +2163,10 @@ MonoBehaviour:
       into yours
     icon: {fileID: 21300000, guid: 09b253245142ba941847b9e9f2903482, type: 3}
     playButton: {fileID: 0}
+  - name: snake 1v1
+    description: you as a snake fight another snake with lazer till death
+    icon: {fileID: 21300000, guid: 09b253245142ba941847b9e9f2903482, type: 3}
+    playButton: {fileID: 0}
   gamePanel: {fileID: 1490300323}
   gameName: {fileID: 483479831}
   gameDesc: {fileID: 1784056523}

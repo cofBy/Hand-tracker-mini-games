@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/mini games/bumper cars.unity
     guid: 1ee45da6dfeb24845bc7868625e17e33
   - enabled: 1
+    path: Assets/Scenes/mini games/snake.unity
+    guid: 11fbaa60a69f2b24994028333350e039
+  - enabled: 1
     path: Assets/Scenes/tracker testing ground.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:

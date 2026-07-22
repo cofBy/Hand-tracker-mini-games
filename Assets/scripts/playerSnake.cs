@@ -21,6 +21,17 @@ public class playerSnake : MonoBehaviour
     public int snakeLength;
     int oldSnakeLength = 0;
 
+    [Header("shooting lazers")]
+    public LineRenderer lazer;
+    public int maxReflections;
+
+    public float lazerUpTime;
+    public float timeBetweenLazers;
+    float lazerTimer;
+    bool shootingLazer;
+
+    public LayerMask wallMask;
+
     private void Update()
     {
         Vector2 dir = handTracker.palmCenter() - rb.position;
@@ -40,8 +51,56 @@ public class playerSnake : MonoBehaviour
                 animator.Segments.Add(bodySegment);
             }
         }
+        handleLazer();
     }
 
+    void handleLazer()
+    {
+        lazerTimer += Time.deltaTime;
+        if (lazerTimer >= timeBetweenLazers)
+        {
+            shootingLazer = lazerTimer <= timeBetweenLazers + lazerUpTime;
+            if (lazerTimer > timeBetweenLazers + lazerUpTime)
+            {
+                shootingLazer = false;
+                lazerTimer -= timeBetweenLazers + lazerUpTime;
+            }
+        }
+
+        lazer.gameObject.SetActive(shootingLazer);
+        if (shootingLazer == false) return;
+
+        RaycastHit2D[] hits = new RaycastHit2D[maxReflections];
+        for (int i = 0; i < maxReflections; i++)
+        {
+            if (i == 0)
+            {
+                hits[i] = Physics2D.Raycast(transform.position, rb.linearVelocity.normalized, float.MaxValue, wallMask);
+                lazer.SetPosition(i, transform.position);
+            }
+            else if (i == 1)
+            {
+                Vector2 bounceDir = Vector2.Reflect(rb.linearVelocity.normalized, hits[i - 1].normal);
+                hits[1] = Physics2D.Raycast(hits[i - 1].point - rb.linearVelocity.normalized * 0.1f, bounceDir, float.MaxValue, wallMask);
+            }
+            else
+            {
+                Vector2 incomeDir = (hits[i - 1].point - hits[i - 2].point).normalized;
+                Vector2 reflectDir = Vector2.Reflect(incomeDir, hits[i - 1].normal);
+
+                Debug.DrawRay(hits[i - 2].point, incomeDir, Color.red);
+                Debug.DrawRay(hits[i - 1].point, reflectDir, Color.blue);
+
+                hits[i] = Physics2D.Raycast(hits[i - 1].point - incomeDir * 0.1f, reflectDir, float.MaxValue, wallMask);
+            }
+
+            if (hits[i] == true)
+            {
+                lazer.positionCount = i + 2;
+                lazer.SetPosition(i + 1, hits[i].point);
+            }
+        }
+    }
     void handleCamera()
     {
         Vector2 target = (Vector2)transform.position + (rb.linearVelocity.normalized * lookAhead);
