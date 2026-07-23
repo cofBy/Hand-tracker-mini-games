@@ -55,8 +55,10 @@ public class Point : MonoBehaviour
         
         if (SegmentPlaces.Length != Segments.Count)
         {
-            Vector3[] newPlaces = new Vector3[SegmentPlaces.Length + 1];
-            for (int i = 0; i < SegmentPlaces.Length; i++)
+            int diff = (int)Mathf.Sign(Segments.Count - SegmentPlaces.Length);
+            Vector3[] newPlaces = new Vector3[SegmentPlaces.Length + diff];
+
+            for (int i = 0; i < newPlaces.Length - Mathf.Abs(diff); i++)
             {
                 newPlaces[i] = SegmentPlaces[i];
             }
@@ -85,12 +87,12 @@ public class Point : MonoBehaviour
                 {
                     if (Vector3.Distance(SegmentPlaces[j], SegmentPlaces[i]) < Segments[j].distance - tolerance & i != j)
                     {
-                        SegmentPlaces[i] = ConstraintDistance(SegmentPlaces[i], SegmentPlaces[j], Segments[j].distance + tolerance);
+                        SegmentPlaces[i] = ConstraintDistance(SegmentPlaces[i], SegmentPlaces[j], Segments[j].distance - tolerance);
                     }
                 }
                 if (Vector3.Distance(LastPlace, SegmentPlaces[i]) < Segments[i].distance - tolerance)
                 {
-                    SegmentPlaces[i] = ConstraintDistance(SegmentPlaces[i], LastPlace, Segments[i].distance + tolerance);
+                    LastPlace = ConstraintDistance(LastPlace, SegmentPlaces[i], Segments[i].distance - tolerance);
                 }
             }
         }

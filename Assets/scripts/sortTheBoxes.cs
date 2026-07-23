@@ -50,6 +50,7 @@ public class sortTheBoxes : MonoBehaviour
             {
                 PoolManager.ReturnToPool(boxInstances[i].gameObject);
                 boxInstances.RemoveAt(i);
+                continue;
             }
 
             float maxX = Camera.main.orthographicSize * ((float)Screen.width / (float)Screen.height) + 1;

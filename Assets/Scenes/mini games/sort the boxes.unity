@@ -404,7 +404,7 @@ MonoBehaviour:
   blue: {r: 0.09019608, g: 0.69803923, b: 1, a: 1}
   red: {r: 0.95294124, g: 0.09411766, b: 0.43921572, a: 1}
   TimeBetweenBoxes: 2.5
-  range: 250
+  range: 100
   scoreLogic: {fileID: 200355834}
 --- !u!1001 &484682956
 PrefabInstance:
