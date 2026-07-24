@@ -54,6 +54,7 @@ public class playerSnake : MonoBehaviour
             else
             {
                 oldSnakeLength -= 1;
+                animator.Segments[animator.Segments.Count - 1].transform.gameObject.tag = "snake";
                 animator.Segments.RemoveAt(animator.Segments.Count - 1);
             }
         }
@@ -62,7 +63,12 @@ public class playerSnake : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("cannibalism! yummi");
+        if (other.gameObject.CompareTag("snake"))
+        {
+            other.gameObject.tag = "Untagged";
+            PoolManager.ReturnToPool(other.gameObject);
+            snakeLength += 1;
+        }
     }
 
     void handleLazer()
