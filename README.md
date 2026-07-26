@@ -1,2 +1,2 @@
-# Hand detection
-Mini game with hand tracker
+# Handy ganes
+an android game with a lot of little mini games
