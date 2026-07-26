@@ -8,6 +8,7 @@ TagManager:
   - car
   - bounds
   - snake
+  - food
   layers:
   - Default
   - TransparentFX
