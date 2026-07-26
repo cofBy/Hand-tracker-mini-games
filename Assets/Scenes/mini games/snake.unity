@@ -560,15 +560,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 544081995}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0.9630116, w: 0.26945996}
+  m_LocalPosition: {x: 11.98, y: -11.34, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1063659248}
   - {fileID: 1038426977}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -148.736}
 --- !u!114 &544081998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -730,17 +730,20 @@ LineRenderer:
   m_SortingOrder: -2
   m_MaskInteraction: 0
   m_Positions:
-  - {x: 0.24384165, y: 0.045114994, z: 0}
-  - {x: 1.2553, y: -0.067269325, z: 0}
-  - {x: 2.266758, y: -0.17965364, z: 0}
-  - {x: 3.3344088, y: -0.067269325, z: 0}
-  - {x: 4.2334824, y: 0.43845987, z: 0}
-  - {x: 5.0763636, y: 1.000381, z: 0}
-  - {x: 5.975438, y: 1.5623022, z: 0}
-  - {x: 6.9868956, y: 1.7308786, z: 0}
-  - {x: 7.9421625, y: 1.056573, z: 0}
-  - {x: 8.447891, y: 0.045114994, z: 0}
-  - {x: 8.504083, y: -0.96634316, z: 0}
+  - {x: 11.798324, y: -11.411195, z: -11.238712}
+  - {x: 10.897527, y: -11.941074, z: -11.238712}
+  - {x: 9.943743, y: -12.311991, z: -11.238712}
+  - {x: 8.93697, y: -12.576931, z: -11.238712}
+  - {x: 7.9301972, y: -12.682907, z: -11.238712}
+  - {x: 6.9234247, y: -12.788883, z: -11.238712}
+  - {x: 5.916652, y: -12.735895, z: -11.238712}
+  - {x: 5.015856, y: -12.259003, z: -11.238712}
+  - {x: 4.115059, y: -11.729122, z: -11.238712}
+  - {x: 3.2142625, y: -11.252231, z: -11.238712}
+  - {x: 2.2604778, y: -10.828326, z: -11.238712}
+  - {x: 1.2537053, y: -10.510398, z: -11.238712}
+  - {x: 0.2469325, y: -10.245458, z: -11.238712}
+  - {x: -0.75984, y: -10.245458, z: -11.238712}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.7
@@ -960,11 +963,12 @@ GameObject:
   m_Component:
   - component: {fileID: 733553469}
   - component: {fileID: 733553468}
+  - component: {fileID: 733553471}
   - component: {fileID: 733553470}
   - component: {fileID: 733553466}
   - component: {fileID: 733553465}
   - component: {fileID: 733553464}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: enemy snake
   m_TagString: snake
   m_Icon: {fileID: 0}
@@ -1021,16 +1025,19 @@ LineRenderer:
   m_SortingOrder: -2
   m_MaskInteraction: 0
   m_Positions:
-  - {x: 0.79674697, y: 11.49016, z: 0}
-  - {x: 1.8067248, y: 11.616406, z: 0}
-  - {x: 2.8167026, y: 11.658489, z: 0}
-  - {x: 3.82668, y: 11.49016, z: 0}
-  - {x: 4.542081, y: 10.7326765, z: 0}
-  - {x: 4.499998, y: 9.722698, z: 0}
-  - {x: 3.9529274, y: 8.838968, z: 0}
-  - {x: 3.1112792, y: 8.291897, z: 0}
-  - {x: 2.0171368, y: 8.039402, z: 0}
-  - {x: 0.9650767, y: 7.871073, z: 0}
+  - {x: -7.5422564, y: 13.122305, z: -11.238712}
+  - {x: -6.535484, y: 13.387245, z: -11.238712}
+  - {x: -5.4757233, y: 13.440233, z: -11.238712}
+  - {x: -4.4159627, y: 13.440233, z: -11.238712}
+  - {x: -3.4091902, y: 13.228281, z: -11.238712}
+  - {x: -2.4554055, y: 12.857365, z: -11.238712}
+  - {x: -1.5546091, y: 12.327484, z: -11.238712}
+  - {x: -0.60082436, y: 11.90358, z: -11.238712}
+  - {x: 0.40594864, y: 11.638639, z: -11.238712}
+  - {x: 1.4127207, y: 11.532664, z: -11.238712}
+  - {x: 2.4194937, y: 11.532664, z: -11.238712}
+  - {x: 3.4792538, y: 11.744616, z: -11.238712}
+  - {x: 4.3800507, y: 12.327484, z: -11.238712}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.7
@@ -1209,7 +1216,7 @@ Transform:
   m_GameObject: {fileID: 733553463}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.8, y: 11.41, z: 0}
+  m_LocalPosition: {x: -7.63, y: 13.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1245,6 +1252,25 @@ MonoBehaviour:
   snakeMask:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &733553471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733553463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3902443d6452c5a4ebfd28c0c826bba0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  states: []
+  rb: {fileID: 733553466}
+  speed: 10
+  player: {fileID: 544082003}
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!1 &1006044617
 GameObject:
   m_ObjectHideFlags: 0

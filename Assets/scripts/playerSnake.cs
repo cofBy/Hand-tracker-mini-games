@@ -22,6 +22,7 @@ public class playerSnake : MonoBehaviour
     {
         Vector2 dir = handTracker.palmCenter() - rb.position;
         rb.linearVelocity = dir.normalized * speed;
+        rb.SetRotation(Mathf.Atan2(rb.linearVelocityY, rb.linearVelocityX));
     }
 
     void handleCamera()
