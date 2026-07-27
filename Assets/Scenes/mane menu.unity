@@ -2163,8 +2163,9 @@ MonoBehaviour:
       into yours
     icon: {fileID: 21300000, guid: 09b253245142ba941847b9e9f2903482, type: 3}
     playButton: {fileID: 0}
-  - name: snake 1v1
-    description: you as a snake fight another snake with lazer till death
+  - name: color clash
+    description: there'll be 3 doors infront of you. choose the one with the color's
+      name displayed at the top
     icon: {fileID: 21300000, guid: 09b253245142ba941847b9e9f2903482, type: 3}
     playButton: {fileID: 0}
   gamePanel: {fileID: 1490300323}
