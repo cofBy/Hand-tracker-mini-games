@@ -23,6 +23,7 @@ public class snakeLogic : MonoBehaviour
 
     public LayerMask wallMask;
     public LayerMask snakeMask;
+    public LayerMask headMask;
 
     private void Update()
     {
@@ -40,6 +41,8 @@ public class snakeLogic : MonoBehaviour
             {
                 oldSnakeLength += 1;
                 GameObject segmentInstance = PoolManager.spawnObject(snakeBodyPrefab, Vector3.zero, Quaternion.identity);
+                segmentInstance.transform.parent = transform;
+
                 Point.segment bodySegment = new Point.segment { transform = segmentInstance.transform, distance = 1f };
                 animator.Segments.Add(bodySegment);
             }
@@ -110,10 +113,18 @@ public class snakeLogic : MonoBehaviour
                 if ((snakeMask.value & (1 << hits[i].collider.gameObject.layer)) != 0)
                 {
                     Point.segment burntSegment = new Point.segment { transform = hits[i].collider.gameObject.transform, distance = 1f };
-                    if (animator.Segments.IndexOf(burntSegment) > 1)
+                    snakeLogic burntSnake = hits[i].collider.gameObject.transform.parent.GetComponent<snakeLogic>();
+                    if (burntSnake.animator.Segments.IndexOf(burntSegment) > 1)
                     {
-                        snakeLength = animator.Segments.IndexOf(burntSegment) + 1;
+                        burntSnake.snakeLength = animator.Segments.IndexOf(burntSegment) + 1;
                     }
+
+                    break;
+                }
+
+                if ((headMask.value & (1 << hits[i].collider.gameObject.layer)) != 0)
+                {
+                    Debug.Log($"{hits[i].collider.gameObject.name} died fr fr");
 
                     break;
                 }

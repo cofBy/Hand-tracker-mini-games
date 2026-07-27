@@ -20,8 +20,8 @@ TagManager:
   - bounds
   - player snake
   - ai snake
-  - 
-  - 
+  - snake body segment
+  - food
   - 
   - 
   - 
