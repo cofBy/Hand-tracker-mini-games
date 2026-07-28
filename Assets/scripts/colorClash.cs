@@ -26,12 +26,16 @@ public class colorClash : MonoBehaviour
         float dir = (handTracker.palmCenter().x - transform.position.x) * xSpeed * Time.deltaTime;
         transform.position = new Vector2(transform.position.x + dir, transform.position.y);
 
-        timer -= Time.deltaTime;
-        if (timer < 0)
+        if (score.timer > 0)
         {
-            timer = Random.Range(minTimeToSpawn, maxTimeToSpawn);
-            Vector2 pos = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width * 0.5f, Screen.height * 1.25f));
-            colorClashDoors doorsInstance = PoolManager.SpawnObject(doorsPrefab, pos, Quaternion.identity);
+            timer -= Time.deltaTime;
+            if (timer < 0)
+            {
+                timer = Random.Range(minTimeToSpawn, maxTimeToSpawn);
+                Vector2 pos = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width * 0.5f, Screen.height * 1.25f));
+                colorClashDoors doorsInstance = PoolManager.SpawnObject(doorsPrefab, pos, Quaternion.identity);
+                doorsInstance.score = score;
+            }
         }
     }
 

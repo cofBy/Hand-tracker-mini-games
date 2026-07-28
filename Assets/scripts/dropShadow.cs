@@ -5,6 +5,8 @@ public class dropShadow : MonoBehaviour
     [Header("spawning shadow")]
     public Vector2 offset;
     GameObject shadow;
+    SpriteRenderer shadowRenderer;
+    SpriteRenderer renderer;
 
     [Header("solid color")]
     public Material mat;
@@ -16,8 +18,8 @@ public class dropShadow : MonoBehaviour
         shadow.transform.parent = transform;
         shadow.transform.localScale = Vector3.one;
 
-        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
-        SpriteRenderer shadowRenderer = shadow.AddComponent<SpriteRenderer>();
+        renderer = GetComponent<SpriteRenderer>();
+        shadowRenderer = shadow.AddComponent<SpriteRenderer>();
 
         shadowRenderer.sprite = renderer.sprite;
         shadowRenderer.material = mat;
@@ -31,5 +33,6 @@ public class dropShadow : MonoBehaviour
     {
         shadow.transform.position = (Vector2)transform.position + offset;
         shadow.transform.rotation = transform.rotation;
+        shadowRenderer.sprite = renderer.sprite;
     }
 }

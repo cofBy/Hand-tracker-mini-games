@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3056945118308469757}
   - component: {fileID: 2173541192399018225}
   - component: {fileID: 5406304409888330010}
+  - component: {fileID: 4962585167477746715}
   m_Layer: 0
   m_Name: door (0)
   m_TagString: Untagged
@@ -139,6 +140,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.95, y: 0.1}
   m_EdgeRadius: 0
+--- !u!114 &4962585167477746715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703329454432919256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079f3e3abdf55224cbcecf35b855290d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::dropShadow
+  offset: {x: 0.4, y: -0.4}
+  mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}
 --- !u!1 &914180851709812335
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +240,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1479652719239140431}
   - component: {fileID: 3849020372066199426}
+  - component: {fileID: 7147899350887364358}
   m_Layer: 0
   m_Name: wall2
   m_TagString: Untagged
@@ -307,6 +323,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!114 &7147899350887364358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262341907630543953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079f3e3abdf55224cbcecf35b855290d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::dropShadow
+  offset: {x: 0.1, y: -0.1}
+  mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}
 --- !u!1 &2063174516925318592
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,6 +347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8016779271227230092}
   - component: {fileID: 5942220770235714309}
+  - component: {fileID: 611909447946335085}
   m_Layer: 0
   m_Name: wall1
   m_TagString: Untagged
@@ -399,6 +430,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!114 &611909447946335085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2063174516925318592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079f3e3abdf55224cbcecf35b855290d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::dropShadow
+  offset: {x: 0.1, y: -0.1}
+  mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}
 --- !u!1 &5760024076635804599
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,6 +455,7 @@ GameObject:
   - component: {fileID: 6024694495449164780}
   - component: {fileID: 223286749629440866}
   - component: {fileID: 6392524414694051928}
+  - component: {fileID: 3333769291864166053}
   m_Layer: 0
   m_Name: door (1)
   m_TagString: Untagged
@@ -538,6 +584,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.95, y: 0.1}
   m_EdgeRadius: 0
+--- !u!114 &3333769291864166053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5760024076635804599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079f3e3abdf55224cbcecf35b855290d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::dropShadow
+  offset: {x: 0.4, y: -0.4}
+  mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}
 --- !u!1 &6568938147165256414
 GameObject:
   m_ObjectHideFlags: 0
@@ -730,6 +790,7 @@ GameObject:
   - component: {fileID: 1946072901657796971}
   - component: {fileID: 753674278871202305}
   - component: {fileID: 8702092070349621730}
+  - component: {fileID: 1331993488631040905}
   m_Layer: 0
   m_Name: door (2)
   m_TagString: Untagged
@@ -858,3 +919,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.95, y: 0.1}
   m_EdgeRadius: 0
+--- !u!114 &1331993488631040905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693926652971870605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079f3e3abdf55224cbcecf35b855290d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::dropShadow
+  offset: {x: 0.4, y: -0.4}
+  mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}

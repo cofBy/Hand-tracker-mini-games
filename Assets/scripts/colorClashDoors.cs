@@ -14,6 +14,9 @@ public class colorClashDoors : MonoBehaviour
 
     public TextMeshPro colorName;
 
+    [Header("despawning")]
+    public scoreManager score;
+
     [System.Serializable] public struct doorColor
     {
         public string name;
@@ -41,7 +44,7 @@ public class colorClashDoors : MonoBehaviour
     private void Update()
     {
         transform.position += Vector3.down * speed * Time.deltaTime;
-        if (transform.position.y < -Camera.main.orthographicSize - 5f)
+        if (transform.position.y < -Camera.main.orthographicSize - 5f || score.timer < 0)
         {
             PoolManager.ReturnToPool(gameObject);
         }
