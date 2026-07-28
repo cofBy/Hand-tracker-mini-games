@@ -7,8 +7,7 @@ TagManager:
   - bomb
   - car
   - bounds
-  - snake
-  - food
+  - targetDoor
   layers:
   - Default
   - TransparentFX
@@ -18,10 +17,10 @@ TagManager:
   - UI
   - box
   - bounds
-  - player snake
-  - ai snake
-  - snake body segment
-  - food
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

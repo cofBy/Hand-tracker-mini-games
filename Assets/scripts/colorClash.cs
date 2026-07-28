@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class colorClash : MonoBehaviour
@@ -7,10 +8,14 @@ public class colorClash : MonoBehaviour
     public float xSpeed;
 
     [Header("spawning doors")]
-    public GameObject doorsPrefab;
+    public colorClashDoors doorsPrefab;
+
     public float minTimeToSpawn;
     public float maxTimeToSpawn;
     float timer;
+
+    [Header("score")]
+    public scoreManager score;
 
     private void Start()
     {
@@ -25,8 +30,20 @@ public class colorClash : MonoBehaviour
         if (timer < 0)
         {
             timer = Random.Range(minTimeToSpawn, maxTimeToSpawn);
-            Vector2 pos = new Vector2(0, Screen.height * 1.25f);
-            PoolManager.spawnObject(doorsPrefab, pos, Quaternion.identity);
+            Vector2 pos = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width * 0.5f, Screen.height * 1.25f));
+            colorClashDoors doorsInstance = PoolManager.SpawnObject(doorsPrefab, pos, Quaternion.identity);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("targetDoor"))
+        {
+            score.score += 1;
+        }
+        else
+        {
+            score.score -= 1;
         }
     }
 }
