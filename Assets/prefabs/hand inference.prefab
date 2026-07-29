@@ -47,6 +47,7 @@ MonoBehaviour:
   palmModelAsset: {fileID: 5022602860645237092, guid: c200f6234613a8545b1f8756d911e6b6, type: 3}
   scoreThreshold: 0.3
   iouThreshold: 0.3
+  flexedThreshold: 2
   maxHands: 1
   model: {fileID: 5022602860645237092, guid: 6bcba581307acce4c8a158a25b22c4a0, type: 3}
   joint: {fileID: 7183587184124686540, guid: 045debb5550e7564a8ded78cd1df5c09, type: 3}
@@ -74,6 +75,5 @@ MonoBehaviour:
   - {x: 0, y: 0}
   - {x: 0, y: 0}
   - {x: 0, y: 0}
-  debugBox: {fileID: 0}
   croppedPalm: {fileID: 0}
   cameraFeed: {fileID: 0}

@@ -16,6 +16,7 @@ public class sentisHandTracker : MonoBehaviour
 
     [Range(0f, 1f)] public float scoreThreshold = 0.5f;
     [Range(0f, 1f)] public float iouThreshold = 0.3f;
+    [Range(1f, 3f)] public float flexedThreshold = 0.3f;
 
     [Header("Multi-hand")]
     [Range(1, 4)] public int maxHands = 2;
@@ -51,12 +52,10 @@ public class sentisHandTracker : MonoBehaviour
     WebCamDevice flipCamera;
 
     [Header("Debugging")]
-    public RectTransform debugBox;
-    List<RectTransform> debugBoxesPerHand = new List<RectTransform>();
-    List<TextMeshProUGUI> directionText = new List<TextMeshProUGUI>();
-    List<TextMeshProUGUI> fistText = new List<TextMeshProUGUI>();
     public RawImage croppedPalm;
     public RawImage cameraFeed;
+    public TextMeshProUGUI isFlexedText;
+    public TextMeshProUGUI isRightHandText;
 
     int[][] fingerJoints = new int[][]
     {
@@ -76,7 +75,8 @@ public class sentisHandTracker : MonoBehaviour
 
     private void Start()
     {
-        blitMaterial = new Material(Shader.Find("Hidden/BlitCopy"));
+        Shader blitShader = Shader.Find("Hidden/BlitCopy") ?? Shader.Find("Unlit/Texture");
+        blitMaterial = new Material(blitShader);
 
         WebCamDevice? frontCam = null;
         foreach (WebCamDevice d in WebCamTexture.devices)
@@ -118,15 +118,6 @@ public class sentisHandTracker : MonoBehaviour
                 fingerSet.Add(lineInstance);
             }
             fingersPerHand.Add(fingerSet);
-
-            if (debugBox != null)
-            {
-                RectTransform dbInstance = Instantiate(debugBox, canvas.transform);
-                dbInstance.gameObject.SetActive(false);
-                debugBoxesPerHand.Add(dbInstance);
-                directionText.Add(dbInstance.GetChild(0).GetComponent<TextMeshProUGUI>());
-                fistText.Add(dbInstance.GetChild(1).GetComponent<TextMeshProUGUI>());
-            }
         }
 
         runtimePalmModel = ModelLoader.Load(palmModelAsset);
@@ -141,9 +132,11 @@ public class sentisHandTracker : MonoBehaviour
         inputTensor = new Tensor<float>(new TensorShape(1, 224, 224, 3));
 
         croppedHandBuffer = new RenderTexture(224, 224, 0, RenderTextureFormat.ARGB32);
+        croppedHandBuffer.Create();
         if (croppedPalm != null) croppedPalm.texture = croppedHandBuffer;
 
         rotatedCam = new RenderTexture(320, 240, 0, RenderTextureFormat.ARGB32);
+        rotatedCam.Create();
     }
     List<Vector2> GeneratePalmAnchors()
     {
@@ -206,11 +199,12 @@ public class sentisHandTracker : MonoBehaviour
                 ProcessLandmarks(cpuTensor, handRect, candidate.angle);
             }
 
-            if (debugBox != null && worker.PeekOutput(2) is Tensor<float> direction)
+            if (worker.PeekOutput(3) is Tensor<float> handednessTensor)
             {
-                using Tensor<float> directionCpu = direction.ReadbackAndClone();
-                float isRightHand = directionCpu.DownloadToArray()[0];
-                directionText[h].text = isRightHand < 0.5f ? "Left Hand" : "Right Hand";
+                using Tensor<float> cpuTensor = handednessTensor.ReadbackAndClone();
+
+                float handedness = cpuTensor[0];
+                isRightHandText.text = handedness > 0f ? "right hand" : "left hand";
             }
 
             if (handLandmarks != null)
@@ -231,23 +225,7 @@ public class sentisHandTracker : MonoBehaviour
                     }
                 }
 
-                int size = Mathf.Max(Screen.width, Screen.height);
-                float offsetX = (Screen.width - size) / 2f;
-                float offsetY = (Screen.height - size) / 2f;
-                float screenX = (handRect.x + handRect.width * 0.5f) * size + offsetX;
-                float screenY = (1f - (handRect.y + handRect.height * 0.5f)) * size + offsetY;
-
-                if (flipCamera.isFrontFacing) screenX = Screen.width - screenX;
-
-                if (debugBox != null)
-                {
-                    debugBoxesPerHand[h].gameObject.SetActive(true);
-                    debugBoxesPerHand[h].position = new Vector3(screenX, screenY, 0);
-                    debugBoxesPerHand[h].sizeDelta = new Vector2(handRect.width * size, handRect.height * size);
-
-                    float angleDegrees = candidate.angle * Mathf.Rad2Deg;
-                    debugBoxesPerHand[h].localRotation = Quaternion.Euler(0, 0, angleDegrees);
-                }
+                isFlexedText.text = isFlexed() ? "flexed" : "extended";
             }
             else
             {
@@ -260,7 +238,6 @@ public class sentisHandTracker : MonoBehaviour
     {
         foreach (var j in jointInstancesPerHand[handIndex]) j.gameObject.SetActive(active);
         foreach (var f in fingersPerHand[handIndex]) f.gameObject.SetActive(active);
-        if (!active && debugBox != null) debugBoxesPerHand[handIndex].gameObject.SetActive(false);
     }
 
     Rect ExpandToSquare(Rect box, float scale)
@@ -502,6 +479,17 @@ public class sentisHandTracker : MonoBehaviour
     {
         if (handLandmarks == null) return new Vector2(0, 0);
         return Vector3.Lerp(handLandmarks[0], handLandmarks[9], 0.5f);
+    }
+    public bool isFlexed()
+    {
+        float sum = 0;
+        float safeDistance = Vector2.Distance(handLandmarks[0], handLandmarks[1]);
+        for (int i = 0; i < 5; i++)
+        {
+            int fingerTipIndex = (i + 1) * 4;
+            sum += Vector2.Distance(handLandmarks[fingerTipIndex], palmCenter()) / safeDistance;
+        }
+        return sum / 5 < flexedThreshold;
     }
 
     private void OnDestroy()
