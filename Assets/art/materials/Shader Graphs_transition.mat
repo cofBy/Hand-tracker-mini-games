@@ -71,7 +71,7 @@ Material:
     - _levels: 20
     - _range: -0.01
     - _res: 256
-    - _time: 0
+    - _time: -1
     m_Colors:
     - _ClipRect: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0, g: 0, b: 0, a: 1}

@@ -199,7 +199,7 @@ public class sentisHandTracker : MonoBehaviour
                 ProcessLandmarks(cpuTensor, handRect, candidate.angle);
             }
 
-            if (worker.PeekOutput(3) is Tensor<float> handednessTensor)
+            if (isRightHandText != null && worker.PeekOutput(3) is Tensor<float> handednessTensor)
             {
                 using Tensor<float> cpuTensor = handednessTensor.ReadbackAndClone();
 
@@ -225,7 +225,7 @@ public class sentisHandTracker : MonoBehaviour
                     }
                 }
 
-                isFlexedText.text = isFlexed() ? "flexed" : "extended";
+                if (isFlexedText != null) isFlexedText.text = isFlexed() ? "flexed" : "extended";
             }
             else
             {
