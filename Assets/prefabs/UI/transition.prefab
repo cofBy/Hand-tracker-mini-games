@@ -88,7 +88,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f0175b4aa994744965a23329a15112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FEEL
-  PublicSounds: []
+  PublicSounds:
+  - clip: {fileID: 8300000, guid: 5bb20802ad0f7924592584b3109bd3c1, type: 3}
+    MinVolume: 0.8
+    MaxVolume: 1
+    MinPitch: 0.8
+    MaxPitch: 1
+    Loop: 0
+    Source: {fileID: 0}
   publicTransitionMat: {fileID: 2100000, guid: 3c08b4e8c38894a45851733c09e62827, type: 2}
   durationSeconds: 0.5
   atStart: 1
