@@ -25,21 +25,27 @@ public class basketball : MonoBehaviour
 
     public float restartSpeed;
 
+    [Header("moving the hoop")]
+    public Transform hoopObject;
+    Vector2 hoopTarget;
+
     [Header("scoring points")]
-    public GameObject hoop;
+    public GameObject hoopCollider;
     public scoreManager score;
 
     private void Start()
     {
         restartPos = transform.position;
         restartGravity = rb.gravityScale;
+        hoopTarget = new Vector2(hoopObject.position.x, Random.Range(8f, -7.5f));
     }
 
     private void Update()
     {
+        if (score.timer < 0) return;
         float hoverDistance = Vector2.Distance(handTracker.palmCenter(), transform.position);
 
-        line.enabled = handTracker.isFlexed();
+        line.enabled = handTracker.isFlexed() && restartTimer <= 0;
 
         Vector3 dir = Vector3.ClampMagnitude(handTracker.palmCenter() - startingPos, maxDistance);
         line.SetPosition(0, transform.position);
@@ -52,6 +58,8 @@ public class basketball : MonoBehaviour
             if (handTracker.isFlexed() == false && restartTimer <= 0)
             {
                 rb.AddForce(-dir * forceMuliplier);
+
+                hoopTarget = new Vector2(hoopObject.position.x, Random.Range(8f, -7.5f));
                 restartTimer = timeToRestart;
             }
         }
@@ -59,6 +67,8 @@ public class basketball : MonoBehaviour
         if (restartTimer <= 0)
         {
             transform.position = Vector2.MoveTowards(transform.position, restartPos, restartSpeed * Time.deltaTime);
+
+            hoopObject.position = Vector2.MoveTowards(hoopObject.position, hoopTarget, restartSpeed * Time.deltaTime);
 
             rb.gravityScale = 0;
             rb.linearVelocity = Vector2.zero;
@@ -70,9 +80,9 @@ public class basketball : MonoBehaviour
             restartTimer -= Time.deltaTime;
         }
 
-        Vector3 hoopDir = (transform.position - hoop.transform.position);
-        float dot = Vector3.Dot(hoopDir.normalized, hoop.transform.up);
-        hoop.SetActive(dot < 0);
+        Vector3 hoopDir = (transform.position - hoopCollider.transform.position);
+        float dot = Vector3.Dot(hoopDir.normalized, hoopCollider.transform.up);
+        hoopCollider.SetActive(dot < 0);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

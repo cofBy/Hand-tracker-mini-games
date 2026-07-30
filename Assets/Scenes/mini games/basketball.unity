@@ -507,7 +507,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -1379,11 +1379,11 @@ MonoBehaviour:
   handTracker: {fileID: 484682957}
   rb: {fileID: 1420305134}
   forceMuliplier: 250
-  ballRadius: 0.8
   maxDistance: 5
   timeToRestart: 3
-  restartSpeed: 10
-  hoop: {fileID: 2055863857}
+  restartSpeed: 15
+  hoopObject: {fileID: 280364710}
+  hoopCollider: {fileID: 2055863857}
   score: {fileID: 2076487557}
 --- !u!58 &1420305133
 CircleCollider2D:
@@ -1607,7 +1607,7 @@ Transform:
   m_GameObject: {fileID: 2055863857}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.3, z: 0}
+  m_LocalPosition: {x: 0, y: -0.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1647,7 +1647,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.1, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -1657,7 +1657,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.8, y: 0.1}
+  m_Size: {x: 0.9, y: 0.1}
   m_EdgeRadius: 0
 --- !u!114 &2076487557 stripped
 MonoBehaviour:

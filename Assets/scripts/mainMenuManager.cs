@@ -30,11 +30,20 @@ public class mainMenuManager : MonoBehaviour
     public Button givePermission;
     public Button Quit;
 
+    [Header("settings")]
+    public Button settingsButton;
+    public Button settingsCloseButton;
+    public GameObject settingsPanel;
+    public TMP_Dropdown quality;
+
     private void Awake()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         gamePanel.SetActive(false);
+        settingsPanel.SetActive(false);
+        QualitySettings.SetQualityLevel(PlayerPrefs.GetInt("quality"));
+
         for (int i = 0; i < miniGames.Count; i++)
         {
             Button buttonInstance = Instantiate(playButtonPrefab, gamesParent);
@@ -47,6 +56,9 @@ public class mainMenuManager : MonoBehaviour
             miniGames[i].playButton.onClick.AddListener(() => setGamePanel(gameIndex));
         }
         exitButton.onClick.AddListener(() => gamePanel.SetActive(false));
+
+        settingsButton.onClick.AddListener(() => settingsPanel.SetActive(true));
+        settingsCloseButton.onClick.AddListener(closeSettings);
     }
 
     private void Start()
@@ -70,6 +82,13 @@ public class mainMenuManager : MonoBehaviour
         {
             getPermissionPanel.SetActive(false);
         }
+    }
+
+    void closeSettings()
+    {
+        settingsPanel.SetActive(false);
+        QualitySettings.SetQualityLevel(quality.value);
+        PlayerPrefs.SetInt("quality", quality.value);
     }
 
     void setGamePanel(int index)
