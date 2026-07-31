@@ -14,6 +14,10 @@ public class colorClash : MonoBehaviour
     public float maxTimeToSpawn;
     float timer;
 
+    [Header("walking noise")]
+    public float timeToStep;
+    float steppingTimer;
+
     [Header("score")]
     public scoreManager score;
 
@@ -35,6 +39,13 @@ public class colorClash : MonoBehaviour
                 Vector2 pos = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width * 0.5f, Screen.height * 1.25f));
                 colorClashDoors doorsInstance = PoolManager.SpawnObject(doorsPrefab, pos, Quaternion.identity);
                 doorsInstance.score = score;
+            }
+
+            steppingTimer -= Time.deltaTime;
+            if (steppingTimer < 0)
+            {
+                steppingTimer = timeToStep;
+                FEEL.PlaySound("lightImpactBasic", 0.2f);
             }
         }
     }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.AppUI.Core;
 using UnityEngine;
 
 public class enemyCarMovement : MonoBehaviour
@@ -92,6 +91,11 @@ public class enemyCarMovement : MonoBehaviour
                 resetTimer = resetTime;
              
                 scoringSystem.score -= 1;
+                FEEL.PlaySound("heavyImpactBasic");
+            }
+            else
+            {
+                FEEL.PlaySound("lightImpactBasic");
             }
 
             Vector2 normal = new Vector2(-hit.normal.y, hit.normal.x).normalized;

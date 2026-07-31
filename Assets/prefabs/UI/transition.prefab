@@ -96,6 +96,34 @@ MonoBehaviour:
     MaxPitch: 1
     Loop: 0
     Source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: b916f9c8225e5b94d9bb61bd4a5a18ee, type: 3}
+    MinVolume: 0.7
+    MaxVolume: 1
+    MinPitch: 0.7
+    MaxPitch: 1
+    Loop: 0
+    Source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 9012b3dd27cd5b9498a657605411341f, type: 3}
+    MinVolume: 0.7
+    MaxVolume: 1
+    MinPitch: 0.7
+    MaxPitch: 1
+    Loop: 0
+    Source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 981127c6478189e4584588564844e1d2, type: 3}
+    MinVolume: 0.7
+    MaxVolume: 1
+    MinPitch: 0.7
+    MaxPitch: 1
+    Loop: 0
+    Source: {fileID: 0}
+  - clip: {fileID: 8300000, guid: 84fc536d16d1b0e4ca803047940159f5, type: 3}
+    MinVolume: 0.7
+    MaxVolume: 1
+    MinPitch: 0.7
+    MaxPitch: 1
+    Loop: 0
+    Source: {fileID: 0}
   publicTransitionMat: {fileID: 2100000, guid: 3c08b4e8c38894a45851733c09e62827, type: 2}
   durationSeconds: 0.5
   atStart: 1

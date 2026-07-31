@@ -351,61 +351,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::dropShadow
   offset: {x: 0.5, y: -0.5}
   mat: {fileID: 2100000, guid: 3c48458a03b09db4cae2a5e1c564a7eb, type: 2}
---- !u!1 &463064940
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 463064941}
-  - component: {fileID: 463064943}
-  m_Layer: 0
-  m_Name: arm
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!4 &463064941
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 463064940}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1822943106}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &463064943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 463064940}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d933091f435af745a979dde6dd27ec4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  handTracker: {fileID: 484682957}
-  maxSpeed: 5
-  maxDistance: 6
-  stick: {fileID: 1822943106}
-  boxPrefab: {fileID: 8389932032766618546, guid: 69ddd75b452b87642a013b7242a9bdb1, type: 3}
-  blue: {r: 0.09019608, g: 0.69803923, b: 1, a: 1}
-  red: {r: 0.95294124, g: 0.09411766, b: 0.43921572, a: 1}
-  TimeBetweenBoxes: 2.5
-  range: 100
-  scoreLogic: {fileID: 200355834}
 --- !u!1001 &484682956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1111,6 +1056,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1822943106}
+  - component: {fileID: 1822943111}
   - component: {fileID: 1822943107}
   - component: {fileID: 1822943108}
   - component: {fileID: 1822943109}
@@ -1137,7 +1083,7 @@ Transform:
   m_Children:
   - {fileID: 254195089}
   - {fileID: 2071989308}
-  m_Father: {fileID: 463064941}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1822943107
 SpriteRenderer:
@@ -1286,6 +1232,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 7
+--- !u!114 &1822943111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822943105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d933091f435af745a979dde6dd27ec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  handTracker: {fileID: 484682957}
+  maxSpeed: 5
+  maxDistance: 6
+  stick: {fileID: 1822943106}
+  boxPrefab: {fileID: 8389932032766618546, guid: 69ddd75b452b87642a013b7242a9bdb1, type: 3}
+  blue: {r: 0.09019608, g: 0.69803923, b: 1, a: 1}
+  red: {r: 0.95294124, g: 0.09411766, b: 0.43921572, a: 1}
+  TimeBetweenBoxes: 2.5
+  range: 100
+  scoreLogic: {fileID: 200355834}
 --- !u!1 &2071989307
 GameObject:
   m_ObjectHideFlags: 0
@@ -1403,5 +1371,5 @@ SceneRoots:
   - {fileID: 200355832}
   - {fileID: 1396690431}
   - {fileID: 1266623215}
-  - {fileID: 463064941}
+  - {fileID: 1822943106}
   - {fileID: 1389908198}

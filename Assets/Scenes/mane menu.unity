@@ -933,7 +933,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 341332816}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 643975654}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &341332816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1482,6 +1494,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8749424946742180760, guid: 21a965ded84a3da4f8217fd7ddcee441, type: 3}
   m_PrefabInstance: {fileID: 643975652}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &643975654 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2552404644766491274, guid: 21a965ded84a3da4f8217fd7ddcee441, type: 3}
+  m_PrefabInstance: {fileID: 643975652}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24f0175b4aa994744965a23329a15112, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FEEL
 --- !u!1 &678228398
 GameObject:
   m_ObjectHideFlags: 0
@@ -2300,7 +2323,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1082859487}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 643975654}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1082859487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2496,7 +2531,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1210226174}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 643975654}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1210226174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2970,7 +3017,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1574584546}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 643975654}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1574584546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3091,7 +3150,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1591598572}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 643975654}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1591598572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3596,7 +3667,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1840291575}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 643975654}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1840291575
 MonoBehaviour:
   m_ObjectHideFlags: 0

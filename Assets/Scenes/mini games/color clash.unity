@@ -900,6 +900,7 @@ MonoBehaviour:
   doorsPrefab: {fileID: -620166864318241062, guid: fc14b31b1b747194b83c770d04d3e600, type: 3}
   minTimeToSpawn: 1
   maxTimeToSpawn: 4
+  timeToStep: 0.5
   score: {fileID: 730424333}
 --- !u!212 &1500721017
 SpriteRenderer:

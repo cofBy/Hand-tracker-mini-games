@@ -9,6 +9,7 @@ TagManager:
   - bounds
   - targetDoor
   - hoop
+  - box
   layers:
   - Default
   - TransparentFX

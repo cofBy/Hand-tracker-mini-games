@@ -48,11 +48,12 @@ public class playerMovement : MonoBehaviour
 
         if (hit)
         {
+            FEEL.PlaySound("lightImpactBasic");
             if (resetTimer <= 0 && hit.collider.gameObject.CompareTag("car"))
             {
                 resetTimer = resetTime;
 
-                scoringSystem.score += 2;
+                scoringSystem.score += 1;
             }
 
             Vector2 normal = new Vector2(-hit.normal.y, hit.normal.x).normalized;

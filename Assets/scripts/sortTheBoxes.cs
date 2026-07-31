@@ -92,4 +92,12 @@ public class sortTheBoxes : MonoBehaviour
         int rnd = Random.Range(0, 2);
         boxInstance.color = rnd == 0 ? blue : red;
     }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("box"))
+        {
+            FEEL.PlaySound("lightImpactBasic");
+        }
+    }
 }

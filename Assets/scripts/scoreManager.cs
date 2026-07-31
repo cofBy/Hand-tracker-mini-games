@@ -8,6 +8,7 @@ public class scoreManager : MonoBehaviour
     [Header("score")]
     public TextMeshProUGUI scoreText;
     public int score;
+    int oldScore;
 
     [Header("timer")]
     public TextMeshPro timerText;
@@ -33,6 +34,16 @@ public class scoreManager : MonoBehaviour
         timer -= Time.deltaTime;
         timer = Mathf.Max(timer, 0);
         timerText.text = Mathf.Round(timer).ToString();
+
+        if (score != oldScore)
+        {
+            int diff = score - oldScore;
+            if (diff > 0) FEEL.PlaySound("scorePoint");
+            if (diff < 0) FEEL.PlaySound("losePoint");
+
+            oldScore = score;
+        }
+
         if (timer == 0)
         {
             gameOverPanel.SetActive(true);

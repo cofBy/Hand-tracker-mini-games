@@ -119,4 +119,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 40659154529112474}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2552404644766491274, guid: 21a965ded84a3da4f8217fd7ddcee441, type: 3}
+        m_TargetAssemblyTypeName: FEEL, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: click
+          m_BoolArgument: 0
+        m_CallState: 2

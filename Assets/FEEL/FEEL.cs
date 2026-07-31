@@ -40,11 +40,11 @@ public class FEEL : MonoBehaviour
         }
     }
 
-    public static void PlaySound(string name)
+    public static void PlaySound(string name, float volumeMultiplier = 1f)
     {
         Sound s = Array.Find(sounds, sound => sound.clip.name == name);
 
-        s.Source.volume = UnityEngine.Random.Range(s.MinVolume, s.MaxVolume);
+        s.Source.volume = UnityEngine.Random.Range(s.MinVolume, s.MaxVolume) * volumeMultiplier;
         s.Source.pitch = UnityEngine.Random.Range(s.MinPitch, s.MaxPitch);
 
         if (s != null)
