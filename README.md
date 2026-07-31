@@ -1,3 +1,5 @@
+<img width="630" height="500" alt="handy mini games thump nail" src="https://github.com/user-attachments/assets/1f62aab4-96db-46e2-8503-f9cf58fd9246" />
+
 # Handy Minigames demo
 an android game with 5 little mini games that revolve around an ai hand tracker
 
